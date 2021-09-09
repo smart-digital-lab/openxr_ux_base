@@ -74,7 +74,7 @@ public class XREvent
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 // The unity event queue for XR events
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
-[System.Serializable]
+[Serializable]
 public class XRDeviceEvents : UnityEvent<XREvent> { };
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -328,7 +328,7 @@ public class XRDeviceManager : MonoBehaviour, _XRDeviceManager
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Each frame, check for any new actions that need sending out.
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    void Update()
+    void FixedUpdate()
     {
         // Check each of the buttons on the left and right controllers and send the appropriate event depending on what is happening.
         //TestButton(leftHandDevices, CommonUsages.triggerButton,         XRDeviceEventTypes.left_trigger,        XRDeviceActions.CLICK);

@@ -1,2 +1,1 @@
-# OpenXR UX Unity Base
-A set of UX tools for use with OpenXR.
+# OpenXR UX Unity BaseA set of UX tools for use with OpenXR.Instructions for use coming soon.There are some Assets included purely for demo purposes from the Asset Store (otherwise, it would be a really boring demo).  These are:* https://assetstore.unity.com/packages/3d/props/furniture/big-furniture-pack-7717* https://assetstore.unity.com/packages/3d/vegetation/trees/free-trees-103208Licences for these items are as per the licence terms on the Unity Asset Store and the respective Asset owners.All other packages included are either standard Unity packages (for example TextMeshPro and OpenXR), or created as part of this project.

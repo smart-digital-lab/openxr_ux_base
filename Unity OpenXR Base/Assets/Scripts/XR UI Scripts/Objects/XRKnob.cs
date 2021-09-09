@@ -178,6 +178,7 @@ public class XRKnob : MonoBehaviour, _XRKnob
                 if ((prevSteppedValue != steppedValue) || firstTime)
                 {
                     if (onChange != null) onChange.Invoke(new XRData(steppedValue));
+                    Debug.Log("OPENXRUX - Knob Rotated : " + steppedValue);
                 }
 
                 // Save the value for next time
