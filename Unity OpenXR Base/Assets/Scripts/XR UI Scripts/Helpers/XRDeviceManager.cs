@@ -207,6 +207,29 @@ public class XRDeviceManager : MonoBehaviour, _XRDeviceManager
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    // Test for devices - sometimes they can take a while to become available
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    private void TestForDevices()
+    {
+        if (leftHandDevices != null)
+        {
+            if (leftHandDevices.Count == 0)
+            {
+                InputDevices.GetDevicesAtXRNode(XRNode.LeftHand, leftHandDevices);
+            }
+        }
+        if (rightHandDevices != null)
+        {
+            if (rightHandDevices.Count == 0)
+            {
+                InputDevices.GetDevicesAtXRNode(XRNode.RightHand, rightHandDevices);
+            }
+        }
+    }
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
 
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Test whether the given button on the give device has activated, and if so send a message.
@@ -330,6 +353,8 @@ public class XRDeviceManager : MonoBehaviour, _XRDeviceManager
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     void FixedUpdate()
     {
+        TestForDevices();
+
         // Check each of the buttons on the left and right controllers and send the appropriate event depending on what is happening.
         //TestButton(leftHandDevices, CommonUsages.triggerButton,         XRDeviceEventTypes.left_trigger,        XRDeviceActions.CLICK);
         TestButton(leftHandDevices, CommonUsages.primaryButton,         XRDeviceEventTypes.left_primary,        XRDeviceActions.CLICK);
