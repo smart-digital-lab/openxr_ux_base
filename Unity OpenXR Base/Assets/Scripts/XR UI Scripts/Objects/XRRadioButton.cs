@@ -33,6 +33,10 @@ public interface _XRRadioButton
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------
+// Main class
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------
+[AddComponentMenu("XR/UX/Objects/XRRadioButton")]
 public class XRRadioButton : MonoBehaviour, _XRRadioButton
 {
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -40,7 +44,7 @@ public class XRRadioButton : MonoBehaviour, _XRRadioButton
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     [Header("____________________________________________________________________________________________________")]
     [Header("A Radio Button that integrates with the OpenXR UX base \nand can be used as part of a set of Radio Buttons.\n____________________________________________________________________________________________________")]
-    [Header("INPUTS\n\n - Title( [ int | float | bool | string ] ) - Set the button title.\n - Input( XRData ) - Boolean value to change the button state as if it was being pressed.")]
+    [Header("INPUTS\n\n - Clear() - Title( [ int | float | bool | string ] ) - Set the button title.\n - Input( XRData ) - Boolean value to change the button state as if it was being pressed.")]
 
     [Header("____________________________________________________________________________________________________")]
     [Header("SETTINGS")]
