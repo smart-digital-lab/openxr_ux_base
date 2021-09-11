@@ -27,11 +27,22 @@ public class GameObjectMenus : MonoBehaviour
         Camera mainCamera = Camera.main;
         if (mainCamera != null)
         {
-            if (mainCamera.gameObject.transform.root == mainCamera.gameObject.transform)
+            if ((mainCamera.gameObject.transform.root == mainCamera.gameObject.transform) ||
+            (mainCamera.gameObject.transform.root.name == "XRRig"))
             {
-                DestroyImmediate(mainCamera.gameObject);
+                Debug.Log("Replacing Main Camera with XRRig with UX");
+                DestroyImmediate(mainCamera.gameObject.transform.root.gameObject);
                 CreateObjectFromPrefab("Assets/Prefabs/XRRig with UX.prefab", "XRRig with UX");
             }
+            else
+            {
+                Debug.LogError("Cannot convert Main Camera GameObject - try deleting it first.");
+            }
+        }
+        else
+        {
+            Debug.Log("No Main Camera - creating one.");
+            CreateObjectFromPrefab("Assets/Prefabs/XRRig with UX.prefab", "XRRig with UX");
         }
     }
 
