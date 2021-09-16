@@ -181,7 +181,7 @@ public class XRButton : MonoBehaviour, _XRButton
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // What to do when the button collider is triggered or untriggered (usually by the pointers).
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    private void OnTriggerEnter(Collider other)
+    void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.tag == "XRLeft") isLeft = true;
         if (other.gameObject.tag == "XRRight") isRight = true;
@@ -189,14 +189,14 @@ public class XRButton : MonoBehaviour, _XRButton
         baseRenderer.material = touchedMaterial;
         if (onTouch != null) onTouch.Invoke();
     }
-    private void OnTriggerStay(Collider other)
+    void OnTriggerStay(Collider other)
     {
         if (other.gameObject.tag == "XRLeft") isLeft = true;
         if (other.gameObject.tag == "XRRight") isRight = true;
         buttonState = ButtonStates.Touched;
         touchTime = Time.time;
     }
-    private void OnTriggerExit(Collider other)
+    void OnTriggerExit(Collider other)
     {
         buttonState = ButtonStates.Up;
         baseRenderer.material = normalMaterial;
