@@ -142,6 +142,14 @@ public class XRData
 
 [Serializable]
 public class UnityXRDataEvent : UnityEvent<XRData> {}
+[Serializable]
+public class UnityIntegerEvent : UnityEvent<int> {}
+[Serializable]
+public class UnityBooleanEvent : UnityEvent<bool> {}
+[Serializable]
+public class UnityFloatEvent : UnityEvent<float> {}
+[Serializable]
+public class UnityStringEvent : UnityEvent<string> {}
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -351,7 +359,7 @@ public class XRDeviceManager : MonoBehaviour, _XRDeviceManager
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Each frame, check for any new actions that need sending out.
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    void FixedUpdate()
+    void Update()
     {
         TestForDevices();
 

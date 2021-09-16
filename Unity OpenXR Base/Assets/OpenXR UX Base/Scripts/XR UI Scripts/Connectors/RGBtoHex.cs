@@ -59,7 +59,7 @@ public class RGBtoHex : MonoBehaviour, _RGBtoHex
 
 
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    // Input values of R, G, B and A
+    // Input values of R, G, B and A and add to the current stored value, sending the response down the event queue
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     public void InputR (XRData newRed)
     {

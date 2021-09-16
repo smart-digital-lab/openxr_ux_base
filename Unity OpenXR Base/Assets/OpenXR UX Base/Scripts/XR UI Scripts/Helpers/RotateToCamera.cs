@@ -54,24 +54,6 @@ public class RotateToCamera : MonoBehaviour
         // The angle to move to
         float newAngle = theCamera.eulerAngles.y + initalYRotationOffset;
 
-        // If the head has turned a lot, just flick it around immediately.
-        // if (Mathf.Abs(newAngle - transform.eulerAngles.y) > 60)
-        // {
-        //     moveOver = false;
-        //     transform.rotation = Quaternion.Euler(0, newAngle, 0);
-        // }
-        // If the head has turned a fair bit, move it fast
-        // if (Mathf.Abs(newAngle - transform.eulerAngles.y) > 60)
-        // {
-        //     moveOver = true;
-        //     smoothness = 0.03f;
-        // }
-        // If the head has turned just a little bit, move it slowly
-        // if (Mathf.Abs(newAngle - transform.eulerAngles.y) > 20)
-        // {
-        //     moveOver = true;
-        //     smoothness = 0.5f;
-        // }
         // If the head has turned only a tiny bit, don't move it all - allows you to look at stuff in the UI without it moving away from view.
         if (Mathf.Abs(newAngle - transform.eulerAngles.y) < 15)
         {

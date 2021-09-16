@@ -57,6 +57,9 @@ public class XRRadioButton : MonoBehaviour, _XRRadioButton
     public Material activatedMaterial; // The material for when pressed
     public Material touchedMaterial; // The material for when touched
 
+    [Header("Starting state")]
+    public bool startState = false;
+
     [Header("____________________________________________________________________________________________________")]
     [Header("OUTPUTS")]
     public UnityXRDataEvent onChange; // Functions to call when the button is toggled on or off (with the bool value set appropriately)
@@ -78,6 +81,7 @@ public class XRRadioButton : MonoBehaviour, _XRRadioButton
     private Vector3 startPosition; //Stores the start position at startup so it can be used for the 'out' position.
     private bool isLeft = false; // Keeps tracks of whether the left or right controller has touched the button for when clicking occurs.
     private bool isRight = false;
+    private bool firstTime = true;
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -161,6 +165,12 @@ public class XRRadioButton : MonoBehaviour, _XRRadioButton
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     void Update()
     {
+        if (firstTime)
+        {
+            Set(startState, true);
+            firstTime = false;
+        }
+
         if (((Time.time - touchTime) > 0.1) && touched)
         {
             if (onUntouch != null) onUntouch.Invoke();

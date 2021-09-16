@@ -48,7 +48,11 @@ public class XRPointer : MonoBehaviour, _XRPointer
     // Private variables
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     private Vector3 markerOriginalSize;
-    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    private bool isTouching = false;
+    public bool IsTouching { get { return isTouching; } }
+    private bool isMovingTo = false;
+    public bool IsMovingTo { get { return isMovingTo; } }
+// ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 
@@ -68,33 +72,47 @@ public class XRPointer : MonoBehaviour, _XRPointer
 
 
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    // Raycast from the pointer and move the pointer if it hits objects on layer 6 (clickable objects) or layer 7 (objects to be able to move onto)
+    // Raycast from the pointer and move the marker if it hits objects on layer 6 (clickable objects) or layer 7 (objects to be able to move onto)
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    void FixedUpdate()
+    void Update()
     {
         if (Marker != null)
         {
             Vector3 fwd = transform.TransformDirection(Vector3.forward);
             RaycastHit hit;
-            if (Physics.Raycast(transform.position, fwd, out hit, 100, 1 << 6))
+            if (Physics.Raycast(transform.position, fwd, out hit, 100, 1<<6 | 1<<7 | 1<<8))
             {
-                Marker.transform.position = hit.point;
-                Marker.transform.localScale = markerOriginalSize;
-                Marker.SetActive(true);
+                int theLayer = hit.collider.gameObject.layer;
+                switch (theLayer)
+                {
+                    case 6:
+                        Marker.transform.position = hit.point;
+                        Marker.transform.localScale = markerOriginalSize;
+                        Marker.SetActive(true);
+                        isTouching = true;
+                        isMovingTo = false;
+                        break;
+                    case 7:
+                        Marker.transform.position = hit.point;
+                        Marker.transform.localScale = markerOriginalSize * 20.0f;
+                        isTouching = false;
+                        isMovingTo = true;
+                        Marker.SetActive(true);
+                        break;
+                    default:
+                        Marker.transform.localPosition = Vector3.zero;
+                        Marker.transform.localScale = markerOriginalSize;
+                        Marker.SetActive(false);
+                        isTouching = false;
+                        isMovingTo = false;
+                        break;
+                }
             }
             else
             {
-                if (Physics.Raycast(transform.position, fwd, out hit, 100, 1 << 7))
-                {
-                    Marker.transform.position = hit.point;
-                    Marker.transform.localScale = markerOriginalSize * 20.0f;  
-                    Marker.SetActive(true);
-                }
-                else
-                {
-                    Marker.transform.localScale = markerOriginalSize;
-                    Marker.SetActive(false);
-                }
+                Marker.transform.localPosition = Vector3.zero;
+                Marker.transform.localScale = markerOriginalSize;
+                Marker.SetActive(false);                
             }
         }
     }

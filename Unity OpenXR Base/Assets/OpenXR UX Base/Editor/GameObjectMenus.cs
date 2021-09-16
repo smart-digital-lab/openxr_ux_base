@@ -76,12 +76,6 @@ public class GameObjectMenus : MonoBehaviour
         CreateObjectFromPrefab("Assets/OpenXR UX Base/Prefabs/XR Console.prefab", "XR Console");
     }
 
-    [MenuItem ("GameObject/OpenXR UX/XR Modules/XR Group")]
-    private static void CreateXRGroup ()
-    {
-        CreateObjectFromPrefab("Assets/OpenXR UX Base/Prefabs/XR Group.prefab", "XR Group");
-    }
-
     [MenuItem ("GameObject/OpenXR UX/XR Modules/XR Inputfield")]
     private static void CreateXRInputfield ()
     {

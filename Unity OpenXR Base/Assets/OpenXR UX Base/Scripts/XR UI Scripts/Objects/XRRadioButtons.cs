@@ -39,7 +39,7 @@ public class XRRadioButtons : MonoBehaviour, _XRRadioButtons
     // Public variables
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     [Header("____________________________________________________________________________________________________")]
-    [Header("The Radio Buttons Group\n\nAdd Radio Buttons as children or create them dynamically below\n____________________________________________________________________________________________________")]
+    [Header("A Group of Radio Buttons\n\nAdd Radio Buttons as children or create them dynamically below\n____________________________________________________________________________________________________")]
     [Header("INPUTS\n\n - Input( XRData ) - Integer value to change which button is selected as if it was being pressed.")]
 
     [Header("____________________________________________________________________________________________________")]
