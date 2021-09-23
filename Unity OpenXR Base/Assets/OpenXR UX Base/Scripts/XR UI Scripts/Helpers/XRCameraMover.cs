@@ -4,7 +4,7 @@
  *
  * 2021-09-07
  *
- * Moves the camera under program (ie user) control.  Should be placed on the XRRig.
+ * Moves the camera under program (ie user) control.  Should be placed on the thePlayer.
  *
  * Roy Davies, Smart Digital Lab, University of Auckland.
  **********************************************************************************************************************************************************/
@@ -44,7 +44,7 @@ public class XRCameraMover : MonoBehaviour, _XRCameraMover
     public MovementStyle movementStyle = MovementStyle.teleportToMarker;
     public GameObject teleportFader;
     public GameObject theHead;
-    public GameObject theBody;
+    public GameObject thePlayer;
     public float teleportFadeTime = 2.0f;
     [Header("Movement Control")]
     public MovementHand movementController = MovementHand.Right;
@@ -116,6 +116,19 @@ public class XRCameraMover : MonoBehaviour, _XRCameraMover
             }
         }
 
+        // Make sure the body and thePlayer start at 0
+        if (thePlayer != null) thePlayer.transform.position = Vector3.zero;
+        RaycastHit hit;
+        bool answer =  (Physics.Raycast(new Vector3(transform.position.x, transform.position.y + 20.0f, transform.position.z), -Vector3.up, out hit, 20.0f, 1<<7));
+        if (answer)
+        {
+            transform.position = hit.point;
+        }
+        else
+        {
+            transform.position = Vector3.zero;            
+        }
+
         // Adjust some of the input parameters
         accelerationFactor = Mathf.Clamp(accelerationFactor, 1.0f, 5.0f);
 
@@ -179,7 +192,7 @@ public class XRCameraMover : MonoBehaviour, _XRCameraMover
         Vector3 nextStep = position + direction;
 
         // Take into account the person wearing the HMD's head height
-        float headHeight = ((theHead == null) || (theBody == null)) ? 2.0f : theHead.transform.position.y - theBody.transform.position.y;
+        float headHeight = (theHead == null) ? 2.0f : theHead.transform.position.y - transform.position.y;
 
         // Raycast down from where we are going to be
         return (Physics.Raycast(new Vector3(nextStep.x, nextStep.y + headHeight, nextStep.z), -Vector3.up, headHeight + 0.1f, 1<<8));
@@ -187,7 +200,7 @@ public class XRCameraMover : MonoBehaviour, _XRCameraMover
     private bool ObstacleCheckForward(Vector3 position, Vector3 direction)
     {
         // Take into account the person wearing the HMD's headheight
-        float headHeight = ((theHead == null) || (theBody == null)) ? 2.0f : theHead.transform.position.y - theBody.transform.position.y;
+        float headHeight = (theHead == null) ? 2.0f : theHead.transform.position.y - transform.position.y;
 
         // Raycast forward from current position towards next position
         return (Physics.Raycast(
@@ -205,7 +218,7 @@ public class XRCameraMover : MonoBehaviour, _XRCameraMover
     private bool heightAbove(Vector3 position, out float height)
     {
         RaycastHit hit;
-        float headHeight = ((theHead == null) || (theBody == null)) ? 2.0f : theHead.transform.position.y - theBody.transform.position.y;
+        float headHeight = (theHead == null) ? 2.0f : theHead.transform.position.y - transform.position.y;
         bool answer =  (Physics.Raycast(new Vector3(position.x, position.y + headHeight, position.z), -Vector3.up, out hit, headHeight + 0.5f, 1<<7));
         if (answer)
         {
@@ -328,18 +341,18 @@ public class XRCameraMover : MonoBehaviour, _XRCameraMover
         else
         {
             // Check if we're are getting close to a no-go area
-            if (ObstacleCheckDown(transform.position, velocity * 10.0f) || ObstacleCheckForward(transform.position, velocity * 10.0f))
-            {
-                hitFrictionFactor = 10.0f;
-                acceleration = Vector3.zero;
-                prevHitFrictionTime = Time.time;
-            }
-            else
-            {
-                // Decelerate the friction slowly in case the object we hit is quite small and we end up checking positions past the object.
-                float t = (Time.time - prevHitFrictionTime) / 2.0f; 
-                hitFrictionFactor = Mathf.SmoothStep(10.0f, 0.0f, t);
-            }
+            // if (ObstacleCheckDown(transform.position, velocity * 10.0f) || ObstacleCheckForward(transform.position, velocity * 10.0f))
+            // {
+            //     hitFrictionFactor = 10.0f;
+            //     acceleration = Vector3.zero;
+            //     prevHitFrictionTime = Time.time;
+            // }
+            // else
+            // {
+            //     // Decelerate the friction slowly in case the object we hit is quite small and we end up checking positions past the object.
+            //     float t = (Time.time - prevHitFrictionTime) / 2.0f; 
+            //     hitFrictionFactor = Mathf.SmoothStep(10.0f, 0.0f, t);
+            // }
 
             // Move there if there are no obstacles, otherwise stop moving.
             if (ObstacleCheckDown(transform.position, velocity) || ObstacleCheckForward(transform.position, velocity))
@@ -450,7 +463,11 @@ public class XRCameraMover : MonoBehaviour, _XRCameraMover
                 }
                 
                 // Stop any movement towards the target marker
-                movingToTarget = false;
+                if (movingToTarget)
+                {
+                    movingToTarget = false;
+                    if (teleportFader != null) teleportFader.SetActive(false);
+                }
             }
             else
             {
@@ -484,6 +501,15 @@ public class XRCameraMover : MonoBehaviour, _XRCameraMover
             {
                 // Only move up and down when thumbstick being used.
                 acceleration = new Vector3(acceleration.x, 0.0f, acceleration.z);
+            }
+        }
+        else
+        {
+            if ((acceleration.y > 0.0f) && !flying)
+            {
+                flying = true;
+                startFlyingTime = Time.time;
+                hitFrictionFactor = 0.0f;
             }
         }
     }
