@@ -4,7 +4,7 @@
  *
  * 2021-09-07
  *
- * Moves the camera under program (ie user) control.  Should be placed on the thePlayer.
+ * Moves the camera under program (ie user) control.  Should be placed on the XRRig or similar.
  *
  * Roy Davies, Smart Digital Lab, University of Auckland.
  **********************************************************************************************************************************************************/
@@ -46,6 +46,8 @@ public class XRCameraMover : MonoBehaviour, _XRCameraMover
     public GameObject theHead;
     public GameObject thePlayer;
     public float teleportFadeTime = 2.0f;
+    [Header("Instructions")]
+    public GameObject instructions;
     [Header("Movement Control")]
     public MovementHand movementController = MovementHand.Right;
     public MovementDevice movementPointer = MovementDevice.Controller;
@@ -74,7 +76,7 @@ public class XRCameraMover : MonoBehaviour, _XRCameraMover
     private float angularVelocity;
     private float angularAcceleration;
     private float hitFrictionFactor = 0.0f; // Between 0.0f and 0.5f
-    private float prevHitFrictionTime = 0.0f;
+    //private float prevHitFrictionTime = 0.0f;
 
     private bool movingToTarget = false;
     private bool fadingInAndOut = false;
@@ -83,6 +85,7 @@ public class XRCameraMover : MonoBehaviour, _XRCameraMover
     private Vector3 targetDestination;
     private float startFlyingTime;
     private bool flying = false;
+    private bool moved = false;
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -106,6 +109,7 @@ public class XRCameraMover : MonoBehaviour, _XRCameraMover
         }
         transform.position = Vector3.zero;
 
+        // Make sure the teleport fader is cleared away
         if (teleportFader != null)
         {
             teleportFaderRenderer = teleportFader.GetComponent<Renderer>();
@@ -114,7 +118,11 @@ public class XRCameraMover : MonoBehaviour, _XRCameraMover
                 Material theMaterial = teleportFaderRenderer.material;
                 theMaterial.SetColor("_Color", new Color(theMaterial.color.r, theMaterial.color.r, theMaterial.color.r, 0.0f));
             }
+            teleportFader.SetActive(false);
         }
+
+        // Make sure the instructions are visible
+        if (instructions != null) instructions.SetActive(true);
 
         // Make sure the body and thePlayer start at 0
         if (thePlayer != null) thePlayer.transform.position = Vector3.zero;
@@ -189,6 +197,7 @@ public class XRCameraMover : MonoBehaviour, _XRCameraMover
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     private bool ObstacleCheckDown(Vector3 position, Vector3 direction)
     {
+        // Calculate the next step to take
         Vector3 nextStep = position + direction;
 
         // Take into account the person wearing the HMD's head height
@@ -311,11 +320,10 @@ public class XRCameraMover : MonoBehaviour, _XRCameraMover
         // than collisions as it is simpler for mobile devices, but can sometimes result in odd situations whereby you can slide through objects that should
         // be solid.
 
-
         // Check if flying or not, and behave accordingly
         if (flying)
         {
-            // Move there if there are no obstacles, otherwise stop moving.
+            // Move there if there are no obstacles ahead, otherwise stop moving.
             if (ObstacleCheckForward(transform.position, velocity))
             {
                 velocity = Vector3.zero;
@@ -325,8 +333,10 @@ public class XRCameraMover : MonoBehaviour, _XRCameraMover
             {
                 transform.position = newPosition;
 
+                // Check if we are near the ground
                 float groundHeight = 0.0f;
                 bool hittingGround = heightAbove(newPosition, out groundHeight);
+
                 // Alow a second to start flying, or if getting really close to a 'ground' object
                 if ((Time.time - startFlyingTime) > 1.0f)
                 {
@@ -384,12 +394,30 @@ public class XRCameraMover : MonoBehaviour, _XRCameraMover
 
 
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    // Remove the instructions object from view
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    public void TestAndRemoveInstructions()
+    {
+        if (!moved)
+        {
+            moved = true;
+            if (instructions != null) instructions.SetActive(false);
+        }
+    }
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Helper functions
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     public void TestMoveOrTeleport(XREvent theEvent, XRDeviceEventTypes eventType, GameObject marker, GameObject pointer)
     {
         if ((theEvent.eventType == eventType) && (theEvent.eventAction == XRDeviceActions.CLICK))
         {
+            // Remove Instructions on first move
+            TestAndRemoveInstructions();
+
             if (theEvent.eventBool)
             {
                 if ((marker != null) && (pointer != null))
@@ -433,6 +461,9 @@ public class XRCameraMover : MonoBehaviour, _XRCameraMover
         if ((((theEvent.eventType == XRDeviceEventTypes.right_thumbstick) && (theEvent.eventAction == XRDeviceActions.MOVE)) && (movementController == MovementHand.Right)) ||
         (((theEvent.eventType == XRDeviceEventTypes.left_thumbstick) && (theEvent.eventAction == XRDeviceActions.MOVE)) && (movementController == MovementHand.Left)))
         {
+            // Remove Instructions on first move
+            TestAndRemoveInstructions();
+
             Vector2 thumbstickMovement = theEvent.eventVector;
 
             // Turn left or right
@@ -462,9 +493,10 @@ public class XRCameraMover : MonoBehaviour, _XRCameraMover
                         acceleration = leftPointer.transform.forward * Mathf.Sign(thumbstickMovement.y) * 0.01f;
                 }
                 
-                // Stop any movement towards the target marker
+                // Stop any movement towards the target marker and remove residual friction
                 if (movingToTarget)
                 {
+                    hitFrictionFactor = 0.0f;
                     movingToTarget = false;
                     if (teleportFader != null) teleportFader.SetActive(false);
                 }
@@ -482,6 +514,9 @@ public class XRCameraMover : MonoBehaviour, _XRCameraMover
             if ((((theEvent.eventType == XRDeviceEventTypes.right_thumbstick) && (theEvent.eventAction == XRDeviceActions.MOVE)) && (movementController == MovementHand.Left)) ||
             (((theEvent.eventType == XRDeviceEventTypes.left_thumbstick) && (theEvent.eventAction == XRDeviceActions.MOVE)) && (movementController == MovementHand.Right)))
             {
+                // Remove Instructions on first move
+                TestAndRemoveInstructions();
+
                 Vector2 thumbstickMovement = theEvent.eventVector;
         
                 // Move up or down

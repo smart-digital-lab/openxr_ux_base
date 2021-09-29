@@ -40,6 +40,8 @@ public class XRPointer : MonoBehaviour, _XRPointer
     [Header("SETTINGS")]
     [Header("A GameObject in the SceneGraph to move to where the user is pointing.")]
     public GameObject Marker;
+    [Header("Material for the curved line that connects the hand controller to the marker.")]
+    public Material trailMaterial;
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -52,6 +54,9 @@ public class XRPointer : MonoBehaviour, _XRPointer
     public bool IsTouching { get { return isTouching; } }
     private bool isMovingTo = false;
     public bool IsMovingTo { get { return isMovingTo; } }
+    private LineRenderer trail;
+    private Vector3[] trailPoints;
+    private int trailDensity = 30;
 // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -61,11 +66,22 @@ public class XRPointer : MonoBehaviour, _XRPointer
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     void Start()
     {
+        // Grab the marker object details
         if (Marker != null) 
         {
             markerOriginalSize = Marker.transform.localScale;      
             Marker.SetActive(false);
         }
+
+        // Set up the trail
+        trail = gameObject.AddComponent<LineRenderer>();
+        trailPoints = new Vector3[trailDensity];
+        trail.material = trailMaterial;
+        trail.startWidth = 0.0002f;
+        trail.endWidth = 0.1f;
+        trail.positionCount = trailDensity;
+        trail.SetPositions(trailPoints);
+        trail.generateLightingData = true;
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -91,13 +107,20 @@ public class XRPointer : MonoBehaviour, _XRPointer
                         Marker.SetActive(true);
                         isTouching = true;
                         isMovingTo = false;
+                        trail.enabled = false;
                         break;
                     case 7:
                         Marker.transform.position = hit.point;
-                        Marker.transform.localScale = markerOriginalSize * 20.0f;
+                        Marker.transform.localScale = markerOriginalSize * 30.0f;
                         isTouching = false;
                         isMovingTo = true;
                         Marker.SetActive(true);
+                        trail.enabled = true;
+                        for (int i = 0; i < trailDensity; i++)
+                        {
+                            trailPoints[i] = TravelCurve(transform.position, Marker.transform.position, 0.3f, (((i + 1) * 1.0f) / ((trailDensity + 2) * 1.0f)), Vector3.up);
+                        }
+                        trail.SetPositions(trailPoints);
                         break;
                     default:
                         Marker.transform.localPosition = Vector3.zero;
@@ -105,6 +128,7 @@ public class XRPointer : MonoBehaviour, _XRPointer
                         Marker.SetActive(false);
                         isTouching = false;
                         isMovingTo = false;
+                        trail.enabled = false;
                         break;
                 }
             }
@@ -113,8 +137,28 @@ public class XRPointer : MonoBehaviour, _XRPointer
                 Marker.transform.localPosition = Vector3.zero;
                 Marker.transform.localScale = markerOriginalSize;
                 Marker.SetActive(false);                
+                trail.enabled = false;
             }
         }
+    }
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    // Work out a curve between start (t=0) and end (t=1)
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    Vector3 TravelCurve(Vector3 start, Vector3 end, float height, float t, Vector3 outDirection)
+    {
+        float parabolicT = t * 2 - 1;
+        //start and end are not level, gets more complicated
+        Vector3 travelDirection = end - start;
+        Vector3 levelDirection = end - new Vector3(start.x, end.y, start.z);
+        Vector3 right = Vector3.Cross(travelDirection, levelDirection);
+        Vector3 up = outDirection;
+        Vector3 result = start + t * travelDirection;
+        result += ((-parabolicT * parabolicT + 1) * height) * up.normalized;
+        return result;
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -126,6 +170,7 @@ public class XRPointer : MonoBehaviour, _XRPointer
     void OnDisable()
     {
         if (Marker != null) Marker.SetActive(false);
+        trail.enabled = false;
     }
     void OnEnable()
     {

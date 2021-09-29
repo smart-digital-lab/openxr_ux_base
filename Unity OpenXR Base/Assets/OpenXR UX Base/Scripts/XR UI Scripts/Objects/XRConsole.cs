@@ -34,7 +34,7 @@ public interface _XRConsole
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 // Main class
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
-[AddComponentMenu("OpenXR UX/Objects/XRConsole")]
+[AddComponentMenu("OpenXR UX/Objects/XR Console")]
 public class XRConsole : MonoBehaviour, _XRConsole
 {
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -47,6 +47,9 @@ public class XRConsole : MonoBehaviour, _XRConsole
     [Header("SETTINGS")]
     [Header("Number of lines in the console.")]
     public int numLines = 20;
+
+    [Header("Accept and show global console events.")]
+    public bool acceptGlobal = true;
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -56,6 +59,7 @@ public class XRConsole : MonoBehaviour, _XRConsole
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     private string[] linesOfText;
     private int currentLine = -1;
+    private XRDeviceManager watcher;        // The XR Event Manager
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -78,6 +82,28 @@ public class XRConsole : MonoBehaviour, _XRConsole
     void Awake()
     {
         linesOfText = new string[numLines];
+    }
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    // Set up the link to the event manager
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    void Start()
+    {
+        // Find the object that has the event manager on it.  It should be the only one with tag XREvents.
+        GameObject watcherGameObject = GameObject.FindWithTag("XREvents");
+        if (watcherGameObject == null)
+            Debug.Log("No XR Device Manager in SceneGraph that is tagged XREvents");
+        else
+        {
+            // Get the script
+            watcher = watcherGameObject.GetComponent<XRDeviceManager>();
+
+            // Set up the callback
+            watcher.XREventQueue.AddListener(onDeviceEvent);
+        }
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -151,6 +177,20 @@ public class XRConsole : MonoBehaviour, _XRConsole
             }
             ChangeTextOnTMP textToChange = GetComponentInChildren<ChangeTextOnTMP>(true);
             if (textToChange != null) textToChange.Input(theText);
+        }
+    }
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    // Global Console Events can be sent from anywhere
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    private void onDeviceEvent(XREvent theEvent)
+    {
+        if ((theEvent.eventType == XRDeviceEventTypes.console) && (theEvent.eventAction == XRDeviceActions.CHANGE) && acceptGlobal)
+        {
+            AddLineOfText(theEvent.data.ToString());
         }
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------

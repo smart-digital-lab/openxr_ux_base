@@ -38,6 +38,8 @@ public enum XRDeviceEventTypes {
     heads_down_UI,
     heads_up_UI,
     menu_button,
+    scene,
+    console,
     _
 };
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -49,7 +51,7 @@ public enum XRDeviceEventTypes {
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 public enum XRDeviceActions
 {
-    TOUCH, CLICK, MOVE, LOOKAT, POINTAT, _
+    TOUCH, CLICK, MOVE, LOOKAT, POINTAT, CHANGE, _
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -66,6 +68,7 @@ public class XREvent
     public bool eventBool;      // For buttons
     public float eventFloat;    // For single values (eg the trigger)
     public Vector2 eventVector; // For double values (eg the joystick)
+    public XRData data;         // Misc Data
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -83,6 +86,7 @@ public class XRDeviceEvents : UnityEvent<XREvent> { };
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 // Other events that are sent between XR Modules
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
+[Serializable]
 public enum XRDataType { INT, FLOAT, BOOL, STRING }
 [Serializable]
 public class XRData

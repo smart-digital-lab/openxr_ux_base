@@ -1,10 +1,10 @@
 /**********************************************************************************************************************************************************
- * XRButton
- * --------
+ * XRGenericButton
+ * ---------------
  *
  * 2021-08-25
  *
- * A button that works with OpenXR and is intended to be used with the XR Button prefab.
+ * A generic button class inherited by other button classes that provide the core functionality
  *
  * Roy Davies, Smart Digital Lab, University of Auckland.
  **********************************************************************************************************************************************************/
@@ -15,19 +15,22 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
 
-enum ButtonStates { Up, Down, Touched };
+public enum XRGenericButtonAxis { X, Y, Z, None };
+public enum XRGenericButtonMovement { Toggle, Momentary };
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 // Public functions
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 public interface _XRButton
 {
-    void Title(string newTitle); // Change the text on the button
-    void Title(int newTitle); // Change the text on the button
-    void Title(float newTitle); // Change the text on the button
-    void Title(bool newTitle); // Change the text on the button
+    void Title(string newTitle);            // Change the text on the button
+    void Title(int newTitle);               // Change the text on the button
+    void Title(float newTitle);             // Change the text on the button
+    void Title(bool newTitle);              // Change the text on the button
 
-    void Input(XRData newdata); // Set the state of the button.  If quietly is set to true, doesn't invoke the callbacks.
+    void Input(XRData newdata);             // Set the state of the button.  If quietly is set to true, doesn't invoke the callbacks.
+        
+    string Title();                         // Return the title of the button
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -36,38 +39,41 @@ public interface _XRButton
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 // Main class
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
-[AddComponentMenu("OpenXR UX/Objects/XRButton")]
+[AddComponentMenu("OpenXR UX/Objects/XR Button")]
 public class XRButton : MonoBehaviour, _XRButton
 {
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Public variables
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     [Header("____________________________________________________________________________________________________")]
-    [Header("A pushable button that integrates with the OpenXR UX base.\n____________________________________________________________________________________________________")]
+    [Header("A movable button that integrates with the OpenXR UX base.\n____________________________________________________________________________________________________")]
     [Header("INPUTS\n\n - Title( [ int | float | bool | string ] ) - Set the button title.\n - Input( XRData ) - Boolean value to change the button state as if it was being pressed.")]
 
     [Header("____________________________________________________________________________________________________")]
     [Header("SETTINGS")]
     [Header("The object that will change colour when pressed.")]
-    public Renderer baseRenderer; // The GameObject for the base of the button - the one that needs to change colour and move when pressed
+    public Renderer objectToColor;          // The object that needs to change colour when activated
     [Header("The object that will move when pressed.")]
-    public GameObject pusher; // The GameObject that will move when the button is activated
+    public GameObject objectToMove;         // The GameObject that will move when activated
 
     [Header("Materials for the different interactions states.")]
-    public Material normalMaterial; // The material for when not pressed
-    public Material activatedMaterial; // The material for when pressed
-    public Material touchedMaterial; // The material for when touched
+    public Material normalMaterial;         // The material for when not pressed
+    public Material activatedMaterial;      // The material for when pressed
+    public Material touchedMaterial;        // The material for when touched
 
-    [Header("Whether to move or not.")]
-    public bool moveWhenClicked = true;
+    [Header("Movement Axis (or none), and amount")]
+    public XRGenericButtonAxis movementAxis = XRGenericButtonAxis.Z;
+    public float movementAmount = 0.004f;
+
+    [Header("Button movement style")]
+    public XRGenericButtonMovement movementStyle = XRGenericButtonMovement.Toggle;
 
     [Header("____________________________________________________________________________________________________")]
     [Header("OUTPUTS")]
-    public UnityXRDataEvent onChange; // Changes on click or unclick, with boolean
-    public UnityEvent onClick; // Functions to call when click-down
-    public UnityEvent onUnclick; // Functions to call when click-up
-    public UnityEvent onTouch; // Functions to call when first touched
-    public UnityEvent onUntouch; // Functions to call when no longer touched
+    public UnityXRDataEvent onChange;       // Changes on click or unclick, with boolean
+    public UnityEvent onClick;              // Functions to call when click-down
+    public UnityEvent onUnclick;            // Functions to call when click-up
+    public UnityXRDataEvent onTouch;        // Functions to call when first touched
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -75,12 +81,13 @@ public class XRButton : MonoBehaviour, _XRButton
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Private variables
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    private XRDeviceManager watcher; // The XR Event Manager
-    private ButtonStates buttonState; // Current button state
-    private float touchTime; // Time when last touched - used to make sure the button resets if touch-up doesn't occur - can happen occasionally.
-    private Vector3 startPosition; //Stores the start position at startup so it can be used for the 'out' position.
-    private bool isLeft = false; // Keeps tracks of whether the left or right controller has touched the button for when clicking occurs.
+    private XRDeviceManager watcher;        // The XR Event Manager
+    private bool buttonState = false;       // Current button state
+    private float touchTime;                // Time when last touched - used to make sure the button resets if touch-up doesn't occur - can happen occasionally.
+    private Vector3 startPosition;          // Stores the start position at startup so it can be used for the 'off / out' position.
+    private bool isLeft = false;            // Keeps tracks of whether the left or right controller has touched the button for when clicking occurs.
     private bool isRight = false;
+    private bool touched = false;
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -112,6 +119,30 @@ public class XRButton : MonoBehaviour, _XRButton
 
 
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    // Return the title of the XR Radio Button
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    public string Title()
+    {
+        ChangeTextOnTMP textToChange = GetComponentInChildren<ChangeTextOnTMP>();
+        return ((textToChange == null) ? "" : textToChange.Text());
+    }
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    // Save start position and material
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    void Awake()
+    {
+        if (objectToColor != null) objectToColor.material = normalMaterial;
+        if (objectToMove != null) startPosition = objectToMove.transform.localPosition;       
+    }
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Set up the link to the event manager
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     void Start()
@@ -128,51 +159,50 @@ public class XRButton : MonoBehaviour, _XRButton
             // Set up the callback
             watcher.XREventQueue.AddListener(onDeviceEvent);
         }
-        baseRenderer.material = normalMaterial;
-        if (pusher != null) startPosition = pusher.transform.localPosition;
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    // It is possible that a button may be touched but the system misses the OnTriggerExit event, and it stays touched.  Therefore, after a small amount of
-    // time after the last OnTriggerStay, take the button back to the Up state.
+    // If the touching object disappears before it stops touching, there is no OnTriggerExit event
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     void Update()
     {
-        if (((Time.time - touchTime) > 0.1) && (buttonState != ButtonStates.Up))
+        if (((Time.time - touchTime) > 0.1) && touched)
         {
-            if (buttonState == ButtonStates.Down)
+            if (movementStyle == XRGenericButtonMovement.Momentary)
             {
-                if (onUnclick != null) onUnclick.Invoke();
+                touched = false;
+                Set(false);
             }
-            else if (buttonState == ButtonStates.Touched)
+            else
             {
-                if (onUntouch != null) onUntouch.Invoke();
+                DoTouchExit();
             }
-
-            buttonState = ButtonStates.Up;
-            baseRenderer.material = normalMaterial;
-            if (pusher != null) pusher.transform.localPosition = startPosition;
-            isLeft = isRight = false;
         }
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    // Set the button to up state when being activated
+    // Set the button to the correct state when being activated in case it was not active and missed being moved or coloured
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     void OnDisable()
     {
-        buttonState = ButtonStates.Up;
-        baseRenderer.material = normalMaterial;
+        touched = false;
     }
     void OnEnable()
     {
-        buttonState = ButtonStates.Up;
-        baseRenderer.material = normalMaterial;
+        touched = false;
+        if (movementStyle == XRGenericButtonMovement.Momentary)
+        {
+            Set(false, true);
+        }
+        else
+        {
+            Set(buttonState, true);
+        }
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -183,40 +213,68 @@ public class XRButton : MonoBehaviour, _XRButton
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     void OnTriggerEnter(Collider other)
     {
+        touched = true;
         if (other.gameObject.tag == "XRLeft") isLeft = true;
         if (other.gameObject.tag == "XRRight") isRight = true;
-        buttonState = ButtonStates.Touched;
-        baseRenderer.material = touchedMaterial;
-        if (onTouch != null) onTouch.Invoke();
+        if (objectToColor != null) objectToColor.material = touchedMaterial;
+        if (onTouch != null) onTouch.Invoke(new XRData(true));
     }
     void OnTriggerStay(Collider other)
     {
+        touched = true;
         if (other.gameObject.tag == "XRLeft") isLeft = true;
         if (other.gameObject.tag == "XRRight") isRight = true;
-        buttonState = ButtonStates.Touched;
         touchTime = Time.time;
     }
     void OnTriggerExit(Collider other)
     {
-        buttonState = ButtonStates.Up;
-        baseRenderer.material = normalMaterial;
-        if (pusher != null) pusher.transform.localPosition = startPosition;
+        DoTouchExit();
+    }
+    private void DoTouchExit()
+    {
+        touched = false;
+        if (movementStyle == XRGenericButtonMovement.Momentary)
+        {
+            Set(false);
+        }
+        else
+        {
+            if (buttonState)
+            {
+                if (objectToColor != null) objectToColor.material = activatedMaterial;
+            }
+            else
+            {
+                if (objectToColor != null) objectToColor.material = normalMaterial;
+            }
+        }
         isLeft = isRight = false;
-        if (onUntouch != null) onUntouch.Invoke();
+        if (onTouch != null) onTouch.Invoke(new XRData(false));
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    // Once the button is entered, what to do when one of the triggers is pressed.
+    // Once the button is touched, what to do when one of the triggers is pressed.
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     private void onDeviceEvent(XREvent theEvent)
     {
         if ((((theEvent.eventType == XRDeviceEventTypes.left_trigger) && isLeft) || ((theEvent.eventType == XRDeviceEventTypes.right_trigger) && isRight)) && 
-        (theEvent.eventAction == XRDeviceActions.CLICK) && (buttonState != ButtonStates.Up))
+        (theEvent.eventAction == XRDeviceActions.CLICK) && touched)
         {
-            Set (theEvent.eventBool);
+            Debug.Log("XXXX Clicked and touched = " + touched);
+            if (movementStyle == XRGenericButtonMovement.Momentary)
+            {
+                Set(theEvent.eventBool);
+            }
+            else
+            {
+                if (theEvent.eventBool)
+                {
+                    Set(!buttonState);
+                }
+            }
         }
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -226,24 +284,41 @@ public class XRButton : MonoBehaviour, _XRButton
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Set the button.  Can also be called from other functions via the Input function.
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    private void Set(bool newValue, bool quietly = false)
+    private void Set(bool newButtonState, bool quietly = false)
     {
-        if (newValue)
+        buttonState = newButtonState;
+
+        if (buttonState)
         {
-            buttonState = ButtonStates.Down;
-            baseRenderer.material = activatedMaterial;
-            if (moveWhenClicked && (pusher != null)) pusher.transform.localPosition = new Vector3(startPosition.x, startPosition.y, startPosition.z + 0.004f);
+            if (objectToColor != null) objectToColor.material = activatedMaterial;
+            if (objectToMove != null) 
+            {
+                switch (movementAxis)
+                {
+                    case XRGenericButtonAxis.X:
+                        objectToMove.transform.localPosition = new Vector3(startPosition.x + movementAmount, startPosition.y, startPosition.z);
+                        break;
+                    case XRGenericButtonAxis.Y:
+                        objectToMove.transform.localPosition = new Vector3(startPosition.x, startPosition.y + movementAmount, startPosition.z);
+                        break;
+                    case XRGenericButtonAxis.Z:
+                        objectToMove.transform.localPosition = new Vector3(startPosition.x, startPosition.y, startPosition.z + movementAmount);
+                        break;
+                    default:
+                        break;
+                }
+                
+            }
             if ((onClick != null) && !quietly) onClick.Invoke();
-            if ((onChange != null) && !quietly) onChange.Invoke(new XRData(true));
         }
         else
         {
-            buttonState = ButtonStates.Touched;
-            baseRenderer.material = touchedMaterial;
-            if (moveWhenClicked && (pusher != null)) pusher.transform.localPosition = startPosition;
+            if (objectToColor != null) objectToColor.material = normalMaterial;
+            if (objectToMove != null) objectToMove.transform.localPosition = startPosition;
             if ((onUnclick != null) && !quietly) onUnclick.Invoke();
-            if ((onChange != null) && !quietly) onChange.Invoke(new XRData(false));
         }
+        
+        if ((onChange != null) && !quietly) onChange.Invoke(new XRData(buttonState));
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 }

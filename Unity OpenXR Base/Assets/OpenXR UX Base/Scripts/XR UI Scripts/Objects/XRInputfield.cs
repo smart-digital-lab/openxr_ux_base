@@ -24,11 +24,12 @@ public interface _XRInputfield
     void ShiftLock (bool newValue); // Turn on or off shiftlock
     void Clear(); // Clears the text field
 
-    void Input(string newTitle); // Add some text
-    void Input(float newTitle); // Add some text
-    void Input(int newTitle); // Add some text
-    void Input(bool newTitle); // Add some text
+    void Input(string newData); // Add some text
+    void Input(float newData); // Add some text
+    void Input(int newData); // Add some text
+    void Input(bool newData); // Add some text
     void Input(XRData newData); // Add some text
+    void Input(XRData newEvent, string newData); // Add some text
 
     void Send(); // Send the current collected text over the output
 }
@@ -39,7 +40,7 @@ public interface _XRInputfield
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 // Main class
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
-[AddComponentMenu("OpenXR UX/Objects/XRInputField")]
+[AddComponentMenu("OpenXR UX/Objects/XR InputField")]
 public class XRInputfield : MonoBehaviour, _XRInputfield
 {
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -81,6 +82,8 @@ public class XRInputfield : MonoBehaviour, _XRInputfield
     public void Input(int theItem) { Input (theItem.ToString()); }
     public void Input(bool theItem) { Input (theItem.ToString()); }
     public void Input(XRData theData) { Input(theData.ToString()); }
+    public void Input(XRData theEvent, string theData) { if (theEvent.ToBool()) Input(theData); }
+
    
     public void Input(string theText)
     {
