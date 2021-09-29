@@ -46,6 +46,12 @@ public class GameObjectMenus : MonoBehaviour
         }
     }
 
+    [MenuItem ("GameObject/OpenXR UX/XR Modules/XR Button Group")]
+    private static void CreateXRRadioButtons ()
+    {
+        CreateObjectFromPrefab("Assets/OpenXR UX Base/Prefabs/XR Button Group.prefab", "XR Button Group");
+    }
+
     [MenuItem ("GameObject/OpenXR UX/XR Modules/XR Buttons/XR Button")]
     private static void CreateXRButton ()
     {
@@ -98,12 +104,6 @@ public class GameObjectMenus : MonoBehaviour
     private static void CreateXRRadioButton ()
     {
         CreateObjectFromPrefab("Assets/OpenXR UX Base/Prefabs/XR Radio Button.prefab", "XR Radio Button");
-    }
-
-    [MenuItem ("GameObject/OpenXR UX/XR Modules/XR Radio Buttons")]
-    private static void CreateXRRadioButtons ()
-    {
-        CreateObjectFromPrefab("Assets/OpenXR UX Base/Prefabs/XR Radio Buttons.prefab", "XR Radio Buttons");
     }
 
     [MenuItem ("GameObject/OpenXR UX/XR Modules/XR Slider Switch")]
