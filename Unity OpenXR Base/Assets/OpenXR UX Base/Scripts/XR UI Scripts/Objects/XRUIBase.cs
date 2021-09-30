@@ -57,10 +57,13 @@ public class XRUIBase : MonoBehaviour, _XRUIBase
 
 
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    // Set up the variables ready to go.
+    // Set up the objects ready to go.
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     void Start()
     {
+        if (Maximised != null) SetActiveRecursively(Maximised, true);
+        if (Minimised != null) SetActiveRecursively(Minimised, true);
+
         if (startMinimised)
             Minimise();
         else

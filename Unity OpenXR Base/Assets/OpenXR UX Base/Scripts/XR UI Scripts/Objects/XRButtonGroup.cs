@@ -70,9 +70,9 @@ public class XRButtonGroup : MonoBehaviour, _XRButtonGroup
 
 
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    // Start is called before the first frame update
+    // Set everything up
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    void Start()
+    void Awake()
     {
         // Create the list
         allButtons = new List<XRButton>();

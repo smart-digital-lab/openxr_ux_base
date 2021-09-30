@@ -19,6 +19,9 @@ using UnityEngine;
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 public interface _XRCameraMover
 {
+    void PutOnBrakes();                         // Slow down all movement
+    void SetMovementStyle(XRData selection);    // Set the movement style
+    void StandOnGround();                       // Move the viewpoint to standing on the ground
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -125,17 +128,7 @@ public class XRCameraMover : MonoBehaviour, _XRCameraMover
         if (instructions != null) instructions.SetActive(true);
 
         // Make sure the body and thePlayer start at 0
-        if (thePlayer != null) thePlayer.transform.position = Vector3.zero;
-        RaycastHit hit;
-        bool answer =  (Physics.Raycast(new Vector3(transform.position.x, transform.position.y + 20.0f, transform.position.z), -Vector3.up, out hit, 20.0f, 1<<7));
-        if (answer)
-        {
-            transform.position = hit.point;
-        }
-        else
-        {
-            transform.position = Vector3.zero;            
-        }
+        StandOnGround();
 
         // Adjust some of the input parameters
         accelerationFactor = Mathf.Clamp(accelerationFactor, 1.0f, 5.0f);
@@ -151,6 +144,38 @@ public class XRCameraMover : MonoBehaviour, _XRCameraMover
     public void SetMovementStyle(XRData selection)
     {
         movementStyle = (selection.ToInt() == 0) ? MovementStyle.moveToMarker : MovementStyle.teleportToMarker;
+    }
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    // Slow down on external event
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    public void PutOnBrakes()
+    {
+        hitFrictionFactor = 5.0f;
+    }
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    public void StandOnGround()
+    {
+        if (thePlayer != null) thePlayer.transform.localPosition = Vector3.zero;
+
+        RaycastHit hit;
+        bool answer =  (Physics.Raycast(new Vector3(transform.position.x, transform.position.y + 1.0f, transform.position.z), -Vector3.up, out hit, 2.0f, 1<<7));
+        if (answer)
+        {
+            transform.position = hit.point;
+        }
+        else
+        {
+            transform.position = Vector3.zero;         
+        }   
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -494,11 +519,11 @@ public class XRCameraMover : MonoBehaviour, _XRCameraMover
                 }
                 
                 // Stop any movement towards the target marker and remove residual friction
+                hitFrictionFactor = 0.0f;
                 if (movingToTarget)
                 {
-                    hitFrictionFactor = 0.0f;
-                    movingToTarget = false;
                     if (teleportFader != null) teleportFader.SetActive(false);
+                    movingToTarget = false;
                 }
             }
             else
@@ -530,6 +555,11 @@ public class XRCameraMover : MonoBehaviour, _XRCameraMover
                     flying = true;
                     startFlyingTime = Time.time;
                     hitFrictionFactor = 0.0f;
+                    if (movingToTarget)
+                    {
+                        if (teleportFader != null) teleportFader.SetActive(false);
+                        movingToTarget = false;
+                    }
                 }
             }
             else

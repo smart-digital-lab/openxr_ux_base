@@ -20,6 +20,7 @@ using UnityEngine.SceneManagement;
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 public interface _SetScene
 {
+    void Input(XRData newRotation);
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -31,36 +32,42 @@ public interface _SetScene
 [AddComponentMenu("OpenXR UX/Tools/Set Scene")]
 public class SetScene : MonoBehaviour, _SetScene
 {
-    [Header("____________________________________________________________________________________________________")]
-    [Header("SETTINGS")]
-    public GameObject teleportFader;
-
-    [Header("____________________________________________________________________________________________________")]
-    [Header("OUTPUTS")]
-    public UnityXRDataEvent onChange; // Functions to call when scene is changed.
-    public UnityXRDataEvent onLoad; // Functions to call when scene is loaded.
-
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Public variables
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    [Header("____________________________________________________________________________________________________")]
+    [Header("Change the Scene and keep the current XRRig.\n____________________________________________________________________________________________________")]
+    [Header("INPUTS\n\n - Input() - Scene number to change to.\n - Event 'scene' and Action 'CHANGE' - From the main event queue.")]
 
+    [Header("____________________________________________________________________________________________________")]
+    [Header("SETTINGS")]
+    [Header("Scene to load on start (-1 for 'stay on this scene')")]
+    public int startScene = -1;
+    public bool persistAcrossScenes = true; // Whether this gameobject should persist across scenes.
+
+    [Header("____________________________________________________________________________________________________")]
+    [Header("OUTPUTS")]
+    public UnityXRDataEvent onChange;   // Functions to call when scene is changed.
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Private variables
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    private XRDeviceManager watcher; // The XR Event Manager
+    private XRDeviceManager watcher;    // The XR Event Manager
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    // Make sure this gameobject is not removed - it goes on the main XRRig
+    // Make sure this gameobject is not removed if on the XRRig - it goes on the main XRRig by default, but can also be used elsewhere.
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     void Awake()
     {
-        DontDestroyOnLoad(this.gameObject);
+        if (persistAcrossScenes)
+        {
+            DontDestroyOnLoad(this.gameObject);
+        }
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -84,28 +91,25 @@ public class SetScene : MonoBehaviour, _SetScene
             watcher.XREventQueue.AddListener(onDeviceEvent);
         }
 
-        // if (SceneManager.sceneCount > 1)
-        // {
-            SceneManager.sceneLoaded += OnSceneLoaded;
-            //StartCoroutine(LoadAsyncScene(1));
-            SceneManager.LoadScene(1);
-        // }
+        // Add the function to call when a scene cahnges
+        SceneManager.sceneLoaded += OnSceneLoaded;
+
+        // Load the start scene if required
+        if (startScene > 0)
+        {
+            SceneManager.LoadScene(startScene % SceneManager.sceneCountInBuildSettings);
+        }
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    // Set the Scene to the given number
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    IEnumerator LoadAsyncScene(int sceneNumber)
+    public void Input (XRData sceneNumber)
     {
-        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneNumber);
-
-        // Wait until the asynchronous scene fully loads
-        while (!asyncLoad.isDone)
-        {
-            yield return null;
-        }
+        Set(sceneNumber.ToInt(), sceneNumber.quietly);
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -114,58 +118,52 @@ public class SetScene : MonoBehaviour, _SetScene
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Set the scene to the given sceneNumber 
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    public void Set(XRData sceneNumber)
+    private void Set(int sceneNumber, bool quietly = false)
     {
-        Set(sceneNumber.ToInt());
-    }
-    public void Set(int sceneNumber)
-    {
-        // if (SceneManager.sceneCount > sceneNumber)
-        // // {
-        //     if (teleportFader != null)
-        //     {
-        //         Renderer teleportFaderRenderer = teleportFader.GetComponent<Renderer>();
-        //         if (teleportFaderRenderer != null)
-        //         {
-        //             Material theMaterial = teleportFaderRenderer.material;
-        //             theMaterial.SetColor("_Color", new Color(theMaterial.color.r, theMaterial.color.r, theMaterial.color.r, 1.0f));
-        //             teleportFader.SetActive(true);
-        //         }
-        //     }
-
-            if (onChange != null) onChange.Invoke(new XRData(sceneNumber));
-            SceneManager.LoadScene(sceneNumber);
-            // StartCoroutine(LoadAsyncScene(sceneNumber));
-        // }
+        if ((onChange != null) && !quietly) onChange.Invoke(new XRData(sceneNumber % SceneManager.sceneCountInBuildSettings));
+        SceneManager.LoadScene(sceneNumber % SceneManager.sceneCountInBuildSettings);
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    // When the Scene is loaded...
+    // When the Scene is loaded, remove any other camera, set up the view and call other onLoad functions
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     void OnSceneLoaded (Scene scene, LoadSceneMode mode)
     {
-        GameObject ENTRY = GameObject.Find("ENTRY");
-        if (ENTRY != null)
+        // Remove any other camera objects (eg an existing XRRig or some test camera), though not the one this script is on if it is the only one.
+        if (persistAcrossScenes)
         {
-            this.gameObject.transform.position = ENTRY.transform.position;
+            Camera[] cameras = Camera.allCameras;
+            foreach (Camera camera in cameras)
+            {
+                if (camera.gameObject.transform.root.gameObject != this.gameObject)
+                {
+                    DestroyImmediate(camera.gameObject.transform.root.gameObject);
+                }               
+            }
+
+            // Find the entry point if it exists
+            GameObject ENTRY = GameObject.Find("ENTRY");
+            if (ENTRY != null)
+            {
+                this.gameObject.transform.position = ENTRY.transform.position;
+            }
+
+            // Slow any movement right down so we don't go zooming into the next scene
+            XRCameraMover xrCameraMoverScript = this.gameObject.GetComponent<XRCameraMover>();
+            if (xrCameraMoverScript != null)
+            {
+                xrCameraMoverScript.PutOnBrakes();
+                xrCameraMoverScript.StandOnGround();
+            }
+
+            // Set the rotation to straight ahead, then back again - this fixes a problem whereby the movement vector became out of sync
+            // float yRot = this.gameObject.transform.rotation.eulerAngles.y;
+            // this.gameObject.transform.rotation = Quaternion.identity;
+            // this.gameObject.transform.rotation = Quaternion.Euler(0, yRot, 0);
         }
-
-        // if (teleportFader != null)
-        // {
-        //     Renderer teleportFaderRenderer = teleportFader.GetComponent<Renderer>();
-        //     if (teleportFaderRenderer != null)
-        //     {
-        //         Material theMaterial = teleportFaderRenderer.material;
-        //         theMaterial.SetColor("_Color", new Color(theMaterial.color.r, theMaterial.color.r, theMaterial.color.r, 0.0f));
-        //         teleportFader.SetActive(false);
-        //     }
-        // }
-
-        this.gameObject.transform.rotation = Quaternion.identity;
-        if (onLoad != null) onLoad.Invoke(new XRData(scene.buildIndex));
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 

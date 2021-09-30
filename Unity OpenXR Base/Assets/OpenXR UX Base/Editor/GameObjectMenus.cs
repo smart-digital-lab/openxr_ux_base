@@ -128,5 +128,11 @@ public class GameObjectMenus : MonoBehaviour
     private static void CreateXRUIBase ()
     {
         CreateObjectFromPrefab("Assets/OpenXR UX Base/Prefabs/XR UI Base.prefab", "XR UI Base");
+    }
+
+    [MenuItem ("GameObject/OpenXR UX/XR Modules/XR Portal")]
+    private static void CreateXRPortal ()
+    {
+        CreateObjectFromPrefab("Assets/OpenXR UX Base/Prefabs/XR Portal.prefab", "XR Portal");
     }  
 }
