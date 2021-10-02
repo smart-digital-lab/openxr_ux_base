@@ -163,6 +163,7 @@ public class UnityStringEvent : UnityEvent<string> {}
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 public interface _XRDeviceManager
 {
+    void SetVisualQuality(int quality);
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -173,6 +174,8 @@ public interface _XRDeviceManager
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 public class XRDeviceManager : MonoBehaviour, _XRDeviceManager
 {
+    [Serializable]
+    public enum VisualQuality {low, medium, normal, high, extra}
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Public variables
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -182,6 +185,8 @@ public class XRDeviceManager : MonoBehaviour, _XRDeviceManager
 
     [Header("____________________________________________________________________________________________________")]
     [Header("SETTINGS")]
+    [Header("Visual Quality - some complex environments benefit from a lower visual quality.")]
+    public VisualQuality visualQuality = VisualQuality.normal;
     [Header("____________________________________________________________________________________________________")]
     [Header("OUTPUTS")]
     public XRDeviceEvents XREventQueue; // The event queue that all the XR UX elements will need to look at to get events.
@@ -204,6 +209,16 @@ public class XRDeviceManager : MonoBehaviour, _XRDeviceManager
 
 
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    public void SetVisualQuality(int quality)
+    {
+        XRSettings.renderViewportScale = (quality % 5) / 5.0f + 0.2f;
+    }
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Set up important variables and data structures
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     void Awake()
@@ -215,6 +230,8 @@ public class XRDeviceManager : MonoBehaviour, _XRDeviceManager
         // Get the devices in the left and right hands respectively
         InputDevices.GetDevicesAtXRNode(XRNode.LeftHand, leftHandDevices);
         InputDevices.GetDevicesAtXRNode(XRNode.RightHand, rightHandDevices);
+
+        XRSettings.eyeTextureResolutionScale = (int)visualQuality / 4.0f + 0.5f;
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 

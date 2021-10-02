@@ -10,7 +10,7 @@ Shader "Custom/Mobile/Water/Simple Water" {
         Tags {
             "IgnoreProjector" = "True"
             "Queue" = "Geometry"
-            "RenderType" = "Opaque"
+            "RenderType" = "Transparent"
         }
         Pass {
             Blend DstColor Zero
@@ -19,7 +19,7 @@ Shader "Custom/Mobile/Water/Simple Water" {
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
- 
+
             #include "UnityCG.cginc"
  
             uniform sampler2D _MainTex;
