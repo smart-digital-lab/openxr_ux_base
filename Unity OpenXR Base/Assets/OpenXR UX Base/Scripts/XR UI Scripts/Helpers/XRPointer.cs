@@ -40,7 +40,7 @@ public class XRPointer : MonoBehaviour, _XRPointer
     [Header("SETTINGS")]
     [Header("A GameObject in the SceneGraph to move to where the user is pointing.")]
     public GameObject Marker;
-    [Header("Material for the curved line that connects the hand controller to the marker.")]
+    [Header("Material for the line that connects the hand controller to the movement or pointer marker.")]
     public Material trailMaterial;
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -56,7 +56,7 @@ public class XRPointer : MonoBehaviour, _XRPointer
     public bool IsMovingTo { get { return isMovingTo; } }
     private LineRenderer trail;
     private Vector3[] trailPoints;
-    private int trailDensity = 30;
+    private int trailDensity = 10;
 // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -77,11 +77,10 @@ public class XRPointer : MonoBehaviour, _XRPointer
         trail = gameObject.AddComponent<LineRenderer>();
         trailPoints = new Vector3[trailDensity];
         trail.material = trailMaterial;
-        trail.startWidth = 0.0002f;
-        trail.endWidth = 0.1f;
         trail.positionCount = trailDensity;
         trail.SetPositions(trailPoints);
         trail.generateLightingData = true;
+        trail.enabled = false;
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -107,7 +106,15 @@ public class XRPointer : MonoBehaviour, _XRPointer
                         Marker.SetActive(true);
                         isTouching = true;
                         isMovingTo = false;
-                        trail.enabled = false;
+                        // trail.enabled = false;
+                        trail.enabled = true;
+                        trail.startWidth = 0.005f;
+                        trail.endWidth = 0.001f;
+                        for (int i = 0; i < trailDensity; i++)
+                        {
+                            trailPoints[i] = TravelCurve(transform.position, Marker.transform.position, 0.0f, ((i * 1.0f) / (trailDensity  * 1.0f)), Vector3.up);
+                        }
+                        trail.SetPositions(trailPoints);
                         break;
                     case 7:
                         Marker.transform.position = hit.point;
@@ -116,6 +123,8 @@ public class XRPointer : MonoBehaviour, _XRPointer
                         isMovingTo = true;
                         Marker.SetActive(true);
                         trail.enabled = true;
+                        trail.startWidth = 0.002f;
+                        trail.endWidth = 0.1f;
                         for (int i = 0; i < trailDensity; i++)
                         {
                             trailPoints[i] = TravelCurve(transform.position, Marker.transform.position, 0.3f, (((i + 1) * 1.0f) / ((trailDensity + 2) * 1.0f)), Vector3.up);
@@ -158,6 +167,18 @@ public class XRPointer : MonoBehaviour, _XRPointer
         Vector3 up = outDirection;
         Vector3 result = start + t * travelDirection;
         result += ((-parabolicT * parabolicT + 1) * height) * up.normalized;
+        return result;
+    }
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    // Work out a line between start (t=0) and end (t=1)
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    Vector3 PointerLine(Vector3 start, Vector3 end, float t)
+    {
+        Vector3 result = Vector3.Lerp(start, end, t);
         return result;
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------

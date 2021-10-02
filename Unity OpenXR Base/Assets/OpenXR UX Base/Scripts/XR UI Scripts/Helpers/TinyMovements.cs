@@ -10,6 +10,8 @@ public class TinyMovements : MonoBehaviour
     Vector3 startPosition;
     float timeSpan;
     MeshRenderer theRenderer;
+    Vector2 offset = Vector2.zero;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -25,8 +27,8 @@ public class TinyMovements : MonoBehaviour
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, step);
         transform.position = Vector3.Slerp(transform.position, targetPosition, step);
 
-        float step2 =2.0f * Time.deltaTime;
-        Vector2 offset = Vector2.MoveTowards(Vector2.zero, Vector2.one, step2);
+        float step2 = 0.01f * Time.deltaTime;
+        offset = Vector2.MoveTowards(offset, Vector2.one, step2);
         if (offset == Vector2.one) offset = Vector2.zero;
 
         theRenderer.material.SetTextureOffset("_MainTex", offset);

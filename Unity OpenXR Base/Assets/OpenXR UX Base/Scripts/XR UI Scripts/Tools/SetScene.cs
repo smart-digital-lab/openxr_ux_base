@@ -95,9 +95,10 @@ public class SetScene : MonoBehaviour, _SetScene
         SceneManager.sceneLoaded += OnSceneLoaded;
 
         // Load the start scene if required
-        if (startScene > 0)
+        if (startScene >= 0)
         {
             SceneManager.LoadScene(startScene % SceneManager.sceneCountInBuildSettings);
+            SetStartPosition();
         }
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -144,28 +145,30 @@ public class SetScene : MonoBehaviour, _SetScene
                 }               
             }
 
-            // Find the entry point if it exists
-            GameObject ENTRY = GameObject.Find("ENTRY");
-            if (ENTRY != null)
-            {
-                this.gameObject.transform.position = ENTRY.transform.position;
-            }
-
-            // Slow any movement right down so we don't go zooming into the next scene
-            XRCameraMover xrCameraMoverScript = this.gameObject.GetComponent<XRCameraMover>();
-            if (xrCameraMoverScript != null)
-            {
-                xrCameraMoverScript.PutOnBrakes();
-                xrCameraMoverScript.StandOnGround();
-            }
-
-            // Set the rotation to straight ahead, then back again - this fixes a problem whereby the movement vector became out of sync
-            // float yRot = this.gameObject.transform.rotation.eulerAngles.y;
-            // this.gameObject.transform.rotation = Quaternion.identity;
-            // this.gameObject.transform.rotation = Quaternion.Euler(0, yRot, 0);
+            SetStartPosition();
         }
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+    private void SetStartPosition()
+    {
+        // Find the entry point if it exists
+        GameObject ENTRY = GameObject.Find("ENTRY");
+        if (ENTRY != null)
+        {
+            this.gameObject.transform.position = ENTRY.transform.position;
+        }
+
+        // Slow any movement right down so we don't go zooming into the next scene
+        XRCameraMover xrCameraMoverScript = this.gameObject.GetComponent<XRCameraMover>();
+        if (xrCameraMoverScript != null)
+        {
+            xrCameraMoverScript.PutOnBrakes();
+            xrCameraMoverScript.StandOnGround();
+        }
+    }
 
 
 
