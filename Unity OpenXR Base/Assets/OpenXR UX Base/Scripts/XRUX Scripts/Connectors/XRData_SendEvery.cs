@@ -64,21 +64,14 @@ public class XRData_SendEvery : MonoBehaviour, _XRData_SendEvery
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     void Update()
     {
-        if ((Time.time - lastTime) > timeInSeconds)
+        if (running)
         {
-            if ((onChange != null) && running) onChange.Invoke(new XRData(true));
-            lastTime = Time.time;
+            if ((Time.time - lastTime) > timeInSeconds)
+            {
+                if (onChange != null) onChange.Invoke(new XRData(true));
+                lastTime = Time.time;
+            }
         }
-    }
-    // ------------------------------------------------------------------------------------------------------------------------------------------------------
-
-
-
-    // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    void Start()
-    {
-        lastTime = Time.time;
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -89,6 +82,10 @@ public class XRData_SendEvery : MonoBehaviour, _XRData_SendEvery
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     public void Go()
     {
+        // Send one event
+        if ((onChange != null) && running) onChange.Invoke(new XRData(true));
+        // And prepare for the next
+        lastTime = Time.time;
         running = true;
     }
     public void Stop()

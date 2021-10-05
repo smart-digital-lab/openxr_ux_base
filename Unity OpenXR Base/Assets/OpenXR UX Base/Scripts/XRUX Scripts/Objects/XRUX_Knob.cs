@@ -44,7 +44,7 @@ public class XRUX_Knob : MonoBehaviour, _XRUX_Knob
     [Header("____________________________________________________________________________________________________")]
     [Header("SETTINGS")]
     [Header("The object that will change colour when touched and rotated.")]
-    public Renderer baseRenderer; // The GameObject for the base of the knob - the one that needs to change colour and move when turned
+    public Renderer objectToMove; // The GameObject for the base of the knob - the one that needs to change colour and move when turned
     [Header("The object that will move when rotated.")]
     public GameObject rotator; // The GameObject that will be rotated when clicked and turned
 
@@ -122,7 +122,7 @@ public class XRUX_Knob : MonoBehaviour, _XRUX_Knob
         // Listen for events coming from the XR Controllers and other devices
         if (XRRig.EventQueue != null) XRRig.EventQueue.AddListener(onDeviceEvent);
 
-        baseRenderer.material = normalMaterial;
+        objectToMove.material = normalMaterial;
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -137,7 +137,7 @@ public class XRUX_Knob : MonoBehaviour, _XRUX_Knob
         if (((Time.time - touchTime) > 0.1) && touched && !clicked)
         {
             touched = false;
-            baseRenderer.material = normalMaterial;
+            objectToMove.material = normalMaterial;
             otherCollider = null;
 
             if (onUntouch != null) onUntouch.Invoke();
@@ -188,12 +188,12 @@ public class XRUX_Knob : MonoBehaviour, _XRUX_Knob
     void OnDisable()
     {
         touched = clicked = false;
-        baseRenderer.material = normalMaterial;
+        objectToMove.material = normalMaterial;
     }
     void OnEnable()
     {
         touched = clicked = false;
-        baseRenderer.material = normalMaterial;
+        objectToMove.material = normalMaterial;
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -210,7 +210,7 @@ public class XRUX_Knob : MonoBehaviour, _XRUX_Knob
             if (other.gameObject.tag == "XRLeft") isLeft = true;
             if (other.gameObject.tag == "XRRight") isRight = true;
             touched = true;
-            baseRenderer.material = touchedMaterial;
+            objectToMove.material = touchedMaterial;
             if (onTouch != null) onTouch.Invoke();
         }
     }
@@ -225,7 +225,7 @@ public class XRUX_Knob : MonoBehaviour, _XRUX_Knob
         if (!clicked)
         {
             touched = false;
-            baseRenderer.material = normalMaterial;
+            objectToMove.material = normalMaterial;
             isLeft = isRight = false;
             if (onUntouch != null) onUntouch.Invoke();
         }
@@ -246,14 +246,14 @@ public class XRUX_Knob : MonoBehaviour, _XRUX_Knob
             if (theEvent.eventBool)
             {
                 clicked = true;
-                baseRenderer.material = activatedMaterial;
+                objectToMove.material = activatedMaterial;
                 clickedOnValue = currentValue;
                 startRotation = otherCollider.gameObject.transform.rotation.eulerAngles.z;
             }
             else
             {
                 clicked = false;
-                baseRenderer.material = touchedMaterial;
+                objectToMove.material = touchedMaterial;
             }
         }
     }

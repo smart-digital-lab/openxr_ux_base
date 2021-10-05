@@ -47,9 +47,9 @@ public class XRUX_ButtonGroup : MonoBehaviour, _XRUX_ButtonGroup
     [Header("Prefab to be used when creating dynamic Buttons.")]
     public GameObject buttonPrefab;    // Link to the button prefab
     [Header("Titles of Buttons to be created dynamically.\nThese will appear below the last Button child object.")]
-    public string[] dynamicRadioButtons;    // Buttons that are created dynamically with the titles filled in from here.
+    public string[] dynamicButtons;    // Buttons that are created dynamically with the titles filled in from here.
     [Header("Vertical spacing between buttons.")]
-    public float dynamicRadioButtonSpacing = 0.025f;
+    public float dynamicButtonSpacing = 0.025f;
 
     [Header("____________________________________________________________________________________________________")]
     [Header("OUTPUTS")]
@@ -88,30 +88,33 @@ public class XRUX_ButtonGroup : MonoBehaviour, _XRUX_ButtonGroup
         // Store the number of fixed items in the list after adding the fixed items to the list.
         fixedItems = allButtons.Count;
 
-        // Create the dynamic buttons.
-        if (buttonPrefab == null)
+        // Create the dynamic buttons (if any).
+        if (dynamicButtons.Length > 0)
         {
-            Debug.Log("No RadioButton Prefab to duplicate");
-        }
-        else
-        {
-            int counter = 0;
-            foreach (string title in dynamicRadioButtons)
+            if (buttonPrefab == null)
             {
-                // Create a new RadioButton
-                GameObject newButton = Instantiate(buttonPrefab);
-                // Get the transform to use as the grouping object
-                Transform group = this.gameObject.transform;
-                // Add the new button to the group
-                newButton.transform.SetParent(group);
-                // Position it relative to the zero position (going down from the top)
-                newButton.transform.localPosition = new Vector3(0, (fixedItems + counter) * -dynamicRadioButtonSpacing, 0);
-                newButton.transform.localRotation = new Quaternion(0, 0, 0, 1);
-                // Set the title
-                XRUX_Button buttonScript = newButton.GetComponent<XRUX_Button>();
-                // Add it to the list of buttons already there.
-                allButtons.Add(buttonScript);
-                counter++;
+                Debug.Log("No Button Prefab to duplicate");
+            }
+            else
+            {
+                int counter = 0;
+                foreach (string title in dynamicButtons)
+                {
+                    // Create a new Button
+                    GameObject newButton = Instantiate(buttonPrefab);
+                    // Get the transform to use as the grouping object
+                    Transform group = this.gameObject.transform;
+                    // Add the new button to the group
+                    newButton.transform.SetParent(group);
+                    // Position it relative to the zero position (going down from the top)
+                    newButton.transform.localPosition = new Vector3(0, (fixedItems + counter) * -dynamicButtonSpacing, 0);
+                    newButton.transform.localRotation = new Quaternion(0, 0, 0, 1);
+                    // Set the title
+                    XRUX_Button buttonScript = newButton.GetComponent<XRUX_Button>();
+                    // Add it to the list of buttons already there.
+                    allButtons.Add(buttonScript);
+                    counter++;
+                }
             }
         }
     }
@@ -137,7 +140,7 @@ public class XRUX_ButtonGroup : MonoBehaviour, _XRUX_ButtonGroup
 
                 // Set the titles of the dynamic items
                 if (counter >= fixedItems)
-                    allButtons[counter].Title(dynamicRadioButtons[counter - fixedItems]);
+                    allButtons[counter].Title(dynamicButtons[counter - fixedItems]);
             }
             firstTime = false;
         }

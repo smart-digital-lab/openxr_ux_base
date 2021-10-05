@@ -33,6 +33,15 @@ public class XRData_From : MonoBehaviour, _XRData_From
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Public variables
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    [Header("____________________________________________________________________________________________________")]
+    [Header("Convert XRData into boolean, float, integer or String.\n____________________________________________________________________________________________________")]
+    [Header("INPUTS\n\n - Input() - XRData value coming in.")]
+
+    [Header("____________________________________________________________________________________________________")]
+    [Header("SETTINGS")]
+
+    [Header("____________________________________________________________________________________________________")]
+    [Header("OUTPUTS")]
     public UnityBooleanEvent onChangeBoolean;
     public UnityFloatEvent onChangeFloat;
     public UnityIntegerEvent onChangeInteger;
@@ -49,27 +58,14 @@ public class XRData_From : MonoBehaviour, _XRData_From
 
 
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    // Convert the input value and send down the correct event queue
+    // Convert the input value and send down the correct event queue depending on which ones are being used.
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     public void Input (XRData newValue)
     {
-        switch (newValue.GetType())
-        {
-            case XRDataType.INT:
-                if (onChangeInteger != null) onChangeInteger.Invoke(newValue.ToInt());
-                break;
-             case XRDataType.BOOL:
-                if (onChangeBoolean != null) onChangeBoolean.Invoke(newValue.ToBool());
-                break;               
-             case XRDataType.FLOAT:
-                if (onChangeFloat != null) onChangeFloat.Invoke(newValue.ToFloat());
-                break;
-            case XRDataType.STRING:
-                if (onChangeString != null) onChangeString.Invoke(newValue.ToString());
-                break;
-            default:
-                break;
-        }
+        if (onChangeInteger != null) onChangeInteger.Invoke(newValue.ToInt());
+        if (onChangeBoolean != null) onChangeBoolean.Invoke(newValue.ToBool());
+        if (onChangeFloat != null) onChangeFloat.Invoke(newValue.ToFloat());
+        if (onChangeString != null) onChangeString.Invoke(newValue.ToString());
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 }

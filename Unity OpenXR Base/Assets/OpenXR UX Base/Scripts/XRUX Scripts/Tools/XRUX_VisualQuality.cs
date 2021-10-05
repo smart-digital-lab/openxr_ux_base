@@ -4,7 +4,8 @@
  *
  * 2021-10-05
  *
- * Sets the visual quality on load.  A good object to put this on is the ENTRY gameobject.
+ * Sets the visual quality on scene load.  A good object to put this on is the ENTRY gameobject.  Doesn't seem to work at any other time, so function can't
+ * be called to adjust quality dynamically
  *
  * Roy Davies, Smart Digital Lab, University of Auckland.
  **********************************************************************************************************************************************************/

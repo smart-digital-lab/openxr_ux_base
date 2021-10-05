@@ -4,7 +4,7 @@
  *
  * 2021-09-27
  *
- * Add, Subtract, Divide or Multiply a set amount to / from XRData integer.
+ * Add, Subtract, Divide or Multiply a set amount to / from two XRData floats.  An output event is only sent once both values have been set.
  *
  * Roy Davies, Smart Digital Lab, University of Auckland.
  **********************************************************************************************************************************************************/
@@ -18,7 +18,8 @@ using UnityEngine;
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 public interface _XRData_Calc
 {
-    void Input(XRData A);
+    void InputA(XRData data);
+    void InputB(XRData data);
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -36,14 +37,12 @@ public class XRData_Calc : MonoBehaviour, _XRData_Calc
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     [Header("____________________________________________________________________________________________________")]
     [Header("Calculate using XRData.\n____________________________________________________________________________________________________")]
-    [Header("INPUTS\n\n - Input() - Input Value.")]
+    [Header("INPUTS\n\n - InputA() - Input Value A.\n - InputB() - Input Value B.")]
 
     [Header("____________________________________________________________________________________________________")]
     [Header("SETTINGS")]
-    [Header("")]
+    [Header("The operation to perform - eg A plus B or A divided_by B.")]
     public operation op = operation.plus;
-    [Header("The amount to add to, subtract from, divide by or multiply with the input XRData.")]
-    public float B;
 
     [Header("____________________________________________________________________________________________________")]
     [Header("OUTPUTS")]
@@ -55,31 +54,52 @@ public class XRData_Calc : MonoBehaviour, _XRData_Calc
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Private variables
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    private float storedA, storedB;
+    private bool setA, setB = false;
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Send answer
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    public void Input(XRData A)
+    public void InputA(XRData data)
     {
-        if (onChange != null)
+        storedA = data.ToFloat();
+        setA = true;
+        if ((onChange != null) && setA && setB)
         {
-            switch (op)
-            {
-                case operation.plus:
-                    onChange.Invoke(new XRData(A.ToInt() + B));
-                    break;
-                case operation.minus:
-                    onChange.Invoke(new XRData(A.ToInt() - B));
-                    break;
-                case operation.divided_by:
-                    onChange.Invoke(new XRData(A.ToInt() / B));
-                    break;
-                default:
-                    onChange.Invoke(new XRData(A.ToInt() * B));
-                break;
-            }
+            onChange.Invoke(new XRData(DoCalc(storedA, op, storedB)));
+        }
+    }
+    public void InputB(XRData data)
+    {
+        storedB = data.ToFloat();
+        setB = true;
+        if ((onChange != null) && setA && setB)
+        {
+            onChange.Invoke(new XRData(DoCalc(storedA, op, storedB)));
+        }
+    }
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    // Do the calculation
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    private float DoCalc(float A, operation op, float B)
+    {
+        switch (op)
+        {
+            case operation.plus:
+                return (A + B);
+            case operation.minus:
+                return (A - B);
+            case operation.divided_by:
+                return (A / B); // Wach out for divide-by-zero errors.
+            default:
+                return (A * B);
         }
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------

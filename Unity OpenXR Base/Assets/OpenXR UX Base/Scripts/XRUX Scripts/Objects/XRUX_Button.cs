@@ -252,7 +252,6 @@ public class XRUX_Button : MonoBehaviour, _XRUX_Button
         if ((((theEvent.eventType == XRDeviceEventTypes.left_trigger) && isLeft) || ((theEvent.eventType == XRDeviceEventTypes.right_trigger) && isRight)) && 
         (theEvent.eventAction == XRDeviceActions.CLICK) && touched)
         {
-            Debug.Log("XXXX Clicked and touched = " + touched);
             if (movementStyle == XRGenericButtonMovement.Momentary)
             {
                 Set(theEvent.eventBool);
