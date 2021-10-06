@@ -60,7 +60,7 @@ public class XRRig_MakeVisible : MonoBehaviour, _XRRig_MakeVisible
         if (XRRig.EventQueue != null) XRRig.EventQueue.AddListener(onButtonEvent);
 
         // Start with the object being inactive / invisible
-        gameObject.SetActive(false);
+        this.gameObject.SetActive(false);
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -73,7 +73,7 @@ public class XRRig_MakeVisible : MonoBehaviour, _XRRig_MakeVisible
     {
         if ((theEvent.eventType == eventToWatchFor) && (theEvent.eventAction == actionToWatchFor))
         {
-            gameObject.SetActive(theEvent.eventBool);
+            this.gameObject.SetActive(theEvent.eventBool);
         }
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------

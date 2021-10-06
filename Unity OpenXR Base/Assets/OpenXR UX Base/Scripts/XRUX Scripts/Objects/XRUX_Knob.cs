@@ -44,9 +44,9 @@ public class XRUX_Knob : MonoBehaviour, _XRUX_Knob
     [Header("____________________________________________________________________________________________________")]
     [Header("SETTINGS")]
     [Header("The object that will change colour when touched and rotated.")]
-    public Renderer objectToMove; // The GameObject for the base of the knob - the one that needs to change colour and move when turned
+    public Renderer objectToColor; // The GameObject for the base of the knob - the one that needs to change colour and move when turned
     [Header("The object that will move when rotated.")]
-    public GameObject rotator; // The GameObject that will be rotated when clicked and turned
+    public GameObject objectToMove; // The GameObject that will be rotated when clicked and turned
 
     [Header("Materials for the different interactions states.")]
     public Material normalMaterial; // The material for when not pressed
@@ -99,7 +99,7 @@ public class XRUX_Knob : MonoBehaviour, _XRUX_Knob
         float knobPosition = (1.0f - (steppedValue / maxValue)) * 360.0f;
 
         // Rotate the knob
-        rotator.transform.localRotation = Quaternion.Euler(0, 0, knobPosition);
+        objectToMove.transform.localRotation = Quaternion.Euler(0, 0, knobPosition);
 
         // Send the event when a change has occured.
         if ((prevSteppedValue != steppedValue) && !quietly)
@@ -122,7 +122,7 @@ public class XRUX_Knob : MonoBehaviour, _XRUX_Knob
         // Listen for events coming from the XR Controllers and other devices
         if (XRRig.EventQueue != null) XRRig.EventQueue.AddListener(onDeviceEvent);
 
-        objectToMove.material = normalMaterial;
+        objectToColor.material = normalMaterial;
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -137,7 +137,7 @@ public class XRUX_Knob : MonoBehaviour, _XRUX_Knob
         if (((Time.time - touchTime) > 0.1) && touched && !clicked)
         {
             touched = false;
-            objectToMove.material = normalMaterial;
+            objectToColor.material = normalMaterial;
             otherCollider = null;
 
             if (onUntouch != null) onUntouch.Invoke();
@@ -163,7 +163,7 @@ public class XRUX_Knob : MonoBehaviour, _XRUX_Knob
                 float knobPosition = (1.0f - (steppedValue / maxValue)) * 360.0f;
 
                 // Rotate the knob
-                rotator.transform.localRotation = Quaternion.Euler(0, 0, knobPosition);
+                objectToMove.transform.localRotation = Quaternion.Euler(0, 0, knobPosition);
                 // Send the event when a change has occured.
                 if ((prevSteppedValue != steppedValue) || firstTime)
                 {
@@ -188,12 +188,12 @@ public class XRUX_Knob : MonoBehaviour, _XRUX_Knob
     void OnDisable()
     {
         touched = clicked = false;
-        objectToMove.material = normalMaterial;
+        objectToColor.material = normalMaterial;
     }
     void OnEnable()
     {
         touched = clicked = false;
-        objectToMove.material = normalMaterial;
+        objectToColor.material = normalMaterial;
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -210,7 +210,7 @@ public class XRUX_Knob : MonoBehaviour, _XRUX_Knob
             if (other.gameObject.tag == "XRLeft") isLeft = true;
             if (other.gameObject.tag == "XRRight") isRight = true;
             touched = true;
-            objectToMove.material = touchedMaterial;
+            objectToColor.material = touchedMaterial;
             if (onTouch != null) onTouch.Invoke();
         }
     }
@@ -225,7 +225,7 @@ public class XRUX_Knob : MonoBehaviour, _XRUX_Knob
         if (!clicked)
         {
             touched = false;
-            objectToMove.material = normalMaterial;
+            objectToColor.material = normalMaterial;
             isLeft = isRight = false;
             if (onUntouch != null) onUntouch.Invoke();
         }
@@ -246,14 +246,14 @@ public class XRUX_Knob : MonoBehaviour, _XRUX_Knob
             if (theEvent.eventBool)
             {
                 clicked = true;
-                objectToMove.material = activatedMaterial;
+                objectToColor.material = activatedMaterial;
                 clickedOnValue = currentValue;
                 startRotation = otherCollider.gameObject.transform.rotation.eulerAngles.z;
             }
             else
             {
                 clicked = false;
-                objectToMove.material = touchedMaterial;
+                objectToColor.material = touchedMaterial;
             }
         }
     }
