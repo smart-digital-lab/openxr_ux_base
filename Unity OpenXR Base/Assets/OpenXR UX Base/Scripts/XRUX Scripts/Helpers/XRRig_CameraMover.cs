@@ -35,6 +35,8 @@ public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
     public enum MovementStyle   { teleportToMarker, moveToMarker }
     public enum MovementHand    { Left, Right }
     public enum MovementDevice  { Head, Controller }
+    public enum AntiAliasing    { None, TwoTimes, FourTimes, EightTimes}
+    public enum TextureQuality  { Full, Half, Quarter, Eighth }
 
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Public variables
@@ -63,6 +65,14 @@ public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
     [Header("Rotation Parameters")]
     public float rotationFrictionFactor = 0.5f;
     public float rotationAccelerationFactor = 2.0f;
+    [Header("Dynamic Quality Settings")]
+    public bool dynamicQuality = true;
+    [Header("When moving")]
+    public AntiAliasing movingAntiAliasingLevel = AntiAliasing.None;
+    public TextureQuality movingTextureQuality = TextureQuality.Eighth;
+    [Header("When standing still")]
+    public AntiAliasing standingAntiAliasingLevel = AntiAliasing.EightTimes;
+    public TextureQuality standingTextureQuality = TextureQuality.Full;
     [Header("The marker and pointer objects")]
     public GameObject leftMarker;
     public GameObject rightMarker;
@@ -103,7 +113,7 @@ public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
         if (XRRig.EventQueue != null) XRRig.EventQueue.AddListener(OnDeviceEvent);
 
         // Start at the origin
-        transform.position = Vector3.zero;
+        //transform.position = Vector3.zero;
 
         // Make sure the teleport fader is cleared away
         if (teleportFader != null)
@@ -160,15 +170,15 @@ public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
         if (thePlayer != null) thePlayer.transform.localPosition = Vector3.zero;
 
         RaycastHit hit;
-        bool answer =  (Physics.Raycast(new Vector3(transform.position.x, transform.position.y + 1.0f, transform.position.z), -Vector3.up, out hit, 2.0f, 1<<7));
+        bool answer = (Physics.Raycast(new Vector3(transform.position.x, transform.position.y + 1.0f, transform.position.z), -Vector3.up, out hit, 2.0f, 1<<7));
         if (answer)
         {
             transform.position = hit.point;
         }
-        else
-        {
-            transform.position = Vector3.zero;         
-        }   
+        // else
+        // {
+        //     transform.position = Vector3.zero;         
+        // }   
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -401,6 +411,41 @@ public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
                     transform.position = newPosition;
                 }                 
             }       
+        }
+
+        // Adjust Quality settings on movement
+        if (dynamicQuality)
+        {
+            if ((velocity.magnitude <= 0.005f) && (Mathf.Abs(angularVelocity) <= 0.01f))
+            {
+                if (!currentlyHighQuality)
+                {
+                    switch (standingAntiAliasingLevel)
+                    {
+                        case AntiAliasing.None: QualitySettings.antiAliasing = 0; break;
+                        case AntiAliasing.TwoTimes: QualitySettings.antiAliasing = 2; break;
+                        case AntiAliasing.EightTimes: QualitySettings.antiAliasing = 8; break;
+                        default: QualitySettings.antiAliasing = 4; break;
+                    }
+                    QualitySettings.masterTextureLimit = (int) standingTextureQuality;
+                    currentlyHighQuality = true;
+                }
+            }
+            else
+            {
+                if (currentlyHighQuality)
+                {
+                    switch (movingAntiAliasingLevel)
+                    {
+                        case AntiAliasing.None: QualitySettings.antiAliasing = 0; break;
+                        case AntiAliasing.TwoTimes: QualitySettings.antiAliasing = 2; break;
+                        case AntiAliasing.EightTimes: QualitySettings.antiAliasing = 8; break;
+                        default: QualitySettings.antiAliasing = 4; break;
+                    }
+                    QualitySettings.masterTextureLimit = (int) movingTextureQuality;
+                    currentlyHighQuality = false;
+                }
+            }
         }
 
         // Work out rotation

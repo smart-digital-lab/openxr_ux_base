@@ -4,7 +4,7 @@
  *
  * 2021-10-05
  * 
- * Rotates the obejct it is on by the given speed on the give axis.
+ * Rotates the obejct it is on by the given speed on the given axis.
  * 
  * Roy Davies, Smart Digital Lab, University of Auckland.
  **********************************************************************************************************************************************************/

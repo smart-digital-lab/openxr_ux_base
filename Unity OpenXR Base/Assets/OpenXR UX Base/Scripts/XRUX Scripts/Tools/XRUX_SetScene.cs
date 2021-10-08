@@ -13,6 +13,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.XR;
 
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -20,7 +21,10 @@ using UnityEngine.SceneManagement;
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 public interface _XRUX_SetScene
 {
-    void Input(XRData newRotation);
+    void Input(XRData sceneNumber);
+    void Quality (XRData visualQuality);
+    void Antialias (XRData antiAlias);
+    void TextureLevel (XRData textureLevel);
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -32,6 +36,8 @@ public interface _XRUX_SetScene
 [AddComponentMenu("OpenXR UX/Tools/XRUX Set Scene")]
 public class XRUX_SetScene : MonoBehaviour, _XRUX_SetScene
 {
+    public enum VisualQuality {low, medium, normal, high, extra}
+
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Public variables
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -54,7 +60,7 @@ public class XRUX_SetScene : MonoBehaviour, _XRUX_SetScene
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Private variables
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-
+    VisualQuality visualQuality = VisualQuality.normal;
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -97,11 +103,29 @@ public class XRUX_SetScene : MonoBehaviour, _XRUX_SetScene
 
 
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    // Set the Scene to the given number
+    // Set the Scene to the given number or the quality to the given level
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     public void Input (XRData sceneNumber)
     {
         Set(sceneNumber.ToInt(), sceneNumber.quietly);
+    }
+    public void Quality (XRData quality)
+    {
+        visualQuality = (VisualQuality) (quality.ToInt() % 5);
+    }
+    public void Antialias (XRData antiAlias)
+    {
+        switch (antiAlias.ToInt())
+        {
+            case 0: QualitySettings.antiAliasing = 0; break;
+            case 1: QualitySettings.antiAliasing = 2; break;
+            case 3: QualitySettings.antiAliasing = 8; break;
+            default: QualitySettings.antiAliasing = 4; break;
+        }
+    }
+    public void TextureLevel (XRData textureLevel)
+    {
+        QualitySettings.masterTextureLimit = textureLevel.ToInt() % 4;
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -124,6 +148,8 @@ public class XRUX_SetScene : MonoBehaviour, _XRUX_SetScene
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     void OnSceneLoaded (Scene scene, LoadSceneMode mode)
     {
+        XRSettings.eyeTextureResolutionScale = (int)visualQuality / 4.0f + 0.5f;
+
         // Remove any other camera objects (eg an existing XRRig or some test camera), though not the one this script is on if it is the only one.
         if (persistAcrossScenes)
         {

@@ -5,7 +5,7 @@
  * 2021-09-20
  * 
  * Replaces the colliders on each tree with ones that works with the navigation system.  This is required as otherwise the colliders that the trees have
- * arew in the wrong layer to be noticed by our raycasting movement algorithm.
+ * are in the wrong layer to be noticed by our raycasting movement algorithm.
  * 
  * Roy Davies, Smart Digital Lab, University of Auckland.
  **********************************************************************************************************************************************************/
