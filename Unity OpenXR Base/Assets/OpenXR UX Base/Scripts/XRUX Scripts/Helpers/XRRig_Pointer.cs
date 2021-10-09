@@ -56,7 +56,7 @@ public class XRRig_Pointer : MonoBehaviour, _XRRig_Pointer
     public bool IsMovingTo { get { return isMovingTo; } }
     private LineRenderer trail;
     private Vector3[] trailPoints;
-    private int trailDensity = 10;
+    private int trailDensity = 20;
 // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 

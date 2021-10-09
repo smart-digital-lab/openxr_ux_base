@@ -13,6 +13,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.XR;
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 // Public functions
@@ -36,7 +37,8 @@ public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
     public enum MovementHand    { Left, Right }
     public enum MovementDevice  { Head, Controller }
     public enum AntiAliasing    { None, TwoTimes, FourTimes, EightTimes}
-    public enum TextureQuality  { Full, Half, Quarter, Eighth }
+    public enum TextureQuality  { Eighth, Quarter, Half, Full }
+    public enum VisualQuality   { Low, Medium, Normal, High, Extra }
 
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Public variables
@@ -70,9 +72,15 @@ public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
     [Header("When moving")]
     public AntiAliasing movingAntiAliasingLevel = AntiAliasing.None;
     public TextureQuality movingTextureQuality = TextureQuality.Eighth;
+    public VisualQuality movingVisualQuality = VisualQuality.Medium;
+    public ShadowQuality movingShadowQuality = ShadowQuality.Disable;
+    public ShadowResolution movingShadowResolution = ShadowResolution.Low;
     [Header("When standing still")]
     public AntiAliasing standingAntiAliasingLevel = AntiAliasing.EightTimes;
     public TextureQuality standingTextureQuality = TextureQuality.Full;
+    public VisualQuality standingVisualQuality = VisualQuality.High;
+    public ShadowQuality standingShadowQuality = ShadowQuality.All;
+    public ShadowResolution standingShadowResolution = ShadowResolution.VeryHigh;
     [Header("The marker and pointer objects")]
     public GameObject leftMarker;
     public GameObject rightMarker;
@@ -100,6 +108,7 @@ public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
     private float startFlyingTime;
     private bool flying = false;
     private bool moved = false;
+    private bool currentlyHighQuality = false;
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -416,7 +425,7 @@ public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
         // Adjust Quality settings on movement
         if (dynamicQuality)
         {
-            if ((velocity.magnitude <= 0.005f) && (Mathf.Abs(angularVelocity) <= 0.01f))
+            if ((velocity.magnitude <= 0.005f) && (Mathf.Abs(angularVelocity) <= 0.05f))
             {
                 if (!currentlyHighQuality)
                 {
@@ -427,7 +436,10 @@ public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
                         case AntiAliasing.EightTimes: QualitySettings.antiAliasing = 8; break;
                         default: QualitySettings.antiAliasing = 4; break;
                     }
-                    QualitySettings.masterTextureLimit = (int) standingTextureQuality;
+                    QualitySettings.masterTextureLimit = 3 - (int) standingTextureQuality;
+                    XRSettings.eyeTextureResolutionScale = (int)standingVisualQuality / 4.0f + 0.5f;
+                    QualitySettings.shadows = standingShadowQuality;
+                    QualitySettings.shadowResolution = standingShadowResolution;
                     currentlyHighQuality = true;
                 }
             }
@@ -442,7 +454,10 @@ public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
                         case AntiAliasing.EightTimes: QualitySettings.antiAliasing = 8; break;
                         default: QualitySettings.antiAliasing = 4; break;
                     }
-                    QualitySettings.masterTextureLimit = (int) movingTextureQuality;
+                    QualitySettings.masterTextureLimit = 3 - (int) movingTextureQuality;
+                    XRSettings.eyeTextureResolutionScale = (int)movingVisualQuality / 4.0f + 0.5f;
+                    QualitySettings.shadows = movingShadowQuality;
+                    QualitySettings.shadowResolution = movingShadowResolution;
                     currentlyHighQuality = false;
                 }
             }
