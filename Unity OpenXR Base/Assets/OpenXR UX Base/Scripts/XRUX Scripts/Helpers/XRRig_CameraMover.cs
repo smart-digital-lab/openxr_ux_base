@@ -14,6 +14,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR;
+using UnityEngine.SceneManagement;
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 // Public functions
@@ -36,9 +37,6 @@ public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
     public enum MovementStyle   { teleportToMarker, moveToMarker }
     public enum MovementHand    { Left, Right }
     public enum MovementDevice  { Head, Controller }
-    public enum AntiAliasing    { None, TwoTimes, FourTimes, EightTimes}
-    public enum TextureQuality  { Eighth, Quarter, Half, Full }
-    public enum VisualQuality   { Low, Medium, Normal, High, Extra }
 
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Public variables
@@ -68,17 +66,20 @@ public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
     public float rotationFrictionFactor = 0.5f;
     public float rotationAccelerationFactor = 2.0f;
     [Header("Dynamic Quality Settings")]
+    [Header("Object name in each scene with scene-specific settings.")]
+    public string sceneSettingsObjectName = "ENTRY";
+    [Header("Default settings if no object with above name found in scene.")]
     public bool dynamicQuality = true;
     [Header("When moving")]
-    public AntiAliasing movingAntiAliasingLevel = AntiAliasing.None;
-    public TextureQuality movingTextureQuality = TextureQuality.Eighth;
-    public VisualQuality movingVisualQuality = VisualQuality.Medium;
+    public SceneSettingsAntiAliasing movingAntiAliasingLevel = SceneSettingsAntiAliasing.None;
+    public SceneSettingsTextureQuality movingTextureQuality = SceneSettingsTextureQuality.Eighth;
+    public SceneSettingsVisualQuality movingVisualQuality = SceneSettingsVisualQuality.Medium;
     public ShadowQuality movingShadowQuality = ShadowQuality.Disable;
     public ShadowResolution movingShadowResolution = ShadowResolution.Low;
     [Header("When standing still")]
-    public AntiAliasing standingAntiAliasingLevel = AntiAliasing.EightTimes;
-    public TextureQuality standingTextureQuality = TextureQuality.Full;
-    public VisualQuality standingVisualQuality = VisualQuality.High;
+    public SceneSettingsAntiAliasing standingAntiAliasingLevel = SceneSettingsAntiAliasing.EightTimes;
+    public SceneSettingsTextureQuality standingTextureQuality = SceneSettingsTextureQuality.Full;
+    public SceneSettingsVisualQuality standingVisualQuality = SceneSettingsVisualQuality.High;
     public ShadowQuality standingShadowQuality = ShadowQuality.All;
     public ShadowResolution standingShadowResolution = ShadowResolution.VeryHigh;
     [Header("The marker and pointer objects")]
@@ -99,7 +100,6 @@ public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
     private float angularAcceleration;
     private float hitFrictionFactor = 0.0f; // Between 0.0f and 0.5f
     //private float prevHitFrictionTime = 0.0f;
-
     private bool movingToTarget = false;
     private bool fadingInAndOut = false;
     private float startFadeTime;
@@ -108,7 +108,20 @@ public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
     private float startFlyingTime;
     private bool flying = false;
     private bool moved = false;
+
     private bool currentlyHighQuality = false;
+
+    private bool currentDynamicQuality;
+    private SceneSettingsAntiAliasing currentMovingAntiAliasingLevel;
+    private SceneSettingsTextureQuality currentMovingTextureQuality;
+    private SceneSettingsVisualQuality currentMovingVisualQuality;
+    private ShadowQuality currentMovingShadowQuality;
+    private ShadowResolution currentMovingShadowResolution;
+    private SceneSettingsAntiAliasing currentStandingAntiAliasingLevel;
+    private SceneSettingsTextureQuality currentStandingTextureQuality;
+    private SceneSettingsVisualQuality currentStandingVisualQuality;
+    private ShadowQuality currentStandingShadowQuality;
+    private ShadowResolution currentStandingShadowResolution;
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -121,8 +134,9 @@ public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
         // Listen for events coming from the XR Controllers and other devices
         if (XRRig.EventQueue != null) XRRig.EventQueue.AddListener(OnDeviceEvent);
 
-        // Start at the origin
-        //transform.position = Vector3.zero;
+        // Add the function to call when a scene changes and set the default values
+        SceneManager.sceneLoaded += OnSceneLoaded;
+        GetEntrySettings();
 
         // Make sure the teleport fader is cleared away
         if (teleportFader != null)
@@ -423,23 +437,23 @@ public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
         }
 
         // Adjust Quality settings on movement
-        if (dynamicQuality)
+        if (currentDynamicQuality)
         {
             if ((velocity.magnitude <= 0.005f) && (Mathf.Abs(angularVelocity) <= 0.05f))
             {
                 if (!currentlyHighQuality)
                 {
-                    switch (standingAntiAliasingLevel)
+                    switch (currentStandingAntiAliasingLevel)
                     {
-                        case AntiAliasing.None: QualitySettings.antiAliasing = 0; break;
-                        case AntiAliasing.TwoTimes: QualitySettings.antiAliasing = 2; break;
-                        case AntiAliasing.EightTimes: QualitySettings.antiAliasing = 8; break;
+                        case SceneSettingsAntiAliasing.None: QualitySettings.antiAliasing = 0; break;
+                        case SceneSettingsAntiAliasing.TwoTimes: QualitySettings.antiAliasing = 2; break;
+                        case SceneSettingsAntiAliasing.EightTimes: QualitySettings.antiAliasing = 8; break;
                         default: QualitySettings.antiAliasing = 4; break;
                     }
-                    QualitySettings.masterTextureLimit = 3 - (int) standingTextureQuality;
-                    XRSettings.eyeTextureResolutionScale = (int)standingVisualQuality / 4.0f + 0.5f;
-                    QualitySettings.shadows = standingShadowQuality;
-                    QualitySettings.shadowResolution = standingShadowResolution;
+                    QualitySettings.masterTextureLimit = 3 - (int) currentStandingTextureQuality;
+                    XRSettings.eyeTextureResolutionScale = (int) currentStandingVisualQuality / 4.0f + 0.5f;
+                    QualitySettings.shadows = currentStandingShadowQuality;
+                    QualitySettings.shadowResolution = currentStandingShadowResolution;
                     currentlyHighQuality = true;
                 }
             }
@@ -447,17 +461,17 @@ public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
             {
                 if (currentlyHighQuality)
                 {
-                    switch (movingAntiAliasingLevel)
+                    switch (currentMovingAntiAliasingLevel)
                     {
-                        case AntiAliasing.None: QualitySettings.antiAliasing = 0; break;
-                        case AntiAliasing.TwoTimes: QualitySettings.antiAliasing = 2; break;
-                        case AntiAliasing.EightTimes: QualitySettings.antiAliasing = 8; break;
+                        case SceneSettingsAntiAliasing.None: QualitySettings.antiAliasing = 0; break;
+                        case SceneSettingsAntiAliasing.TwoTimes: QualitySettings.antiAliasing = 2; break;
+                        case SceneSettingsAntiAliasing.EightTimes: QualitySettings.antiAliasing = 8; break;
                         default: QualitySettings.antiAliasing = 4; break;
                     }
-                    QualitySettings.masterTextureLimit = 3 - (int) movingTextureQuality;
-                    XRSettings.eyeTextureResolutionScale = (int)movingVisualQuality / 4.0f + 0.5f;
-                    QualitySettings.shadows = movingShadowQuality;
-                    QualitySettings.shadowResolution = movingShadowResolution;
+                    QualitySettings.masterTextureLimit = 3 - (int) currentMovingTextureQuality;
+                    XRSettings.eyeTextureResolutionScale = (int) currentMovingVisualQuality / 4.0f + 0.5f;
+                    QualitySettings.shadows = currentMovingShadowQuality;
+                    QualitySettings.shadowResolution = currentMovingShadowResolution;
                     currentlyHighQuality = false;
                 }
             }
@@ -628,6 +642,62 @@ public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
                 flying = true;
                 startFlyingTime = Time.time;
                 hitFrictionFactor = 0.0f;
+            }
+        }
+    }
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    // When the Scene is loaded, check if there are scene settings to alter.
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    private void SetSceneSettingsToDefaults()
+    {
+        currentDynamicQuality = dynamicQuality;
+        currentMovingAntiAliasingLevel = movingAntiAliasingLevel;
+        currentMovingTextureQuality = movingTextureQuality;
+        currentMovingVisualQuality = movingVisualQuality;
+        currentMovingShadowQuality = movingShadowQuality;
+        currentMovingShadowResolution = movingShadowResolution;
+        currentStandingAntiAliasingLevel = standingAntiAliasingLevel;
+        currentStandingTextureQuality = standingTextureQuality;
+        currentStandingVisualQuality = standingVisualQuality;
+        currentStandingShadowQuality = standingShadowQuality;
+        currentStandingShadowResolution = standingShadowResolution;          
+    }
+    private void OnSceneLoaded (Scene scene, LoadSceneMode mode)
+    {
+        GetEntrySettings();
+    }
+    private void GetEntrySettings()
+    {
+        // Find the entry point if it exists
+        GameObject ENTRY = GameObject.Find(sceneSettingsObjectName);
+        if (ENTRY == null)
+        {
+            SetSceneSettingsToDefaults();              
+        }
+        else
+        {
+            XRUX_SceneSettings sceneSettings = ENTRY.GetComponent<XRUX_SceneSettings>();
+            if (sceneSettings != null)
+            {
+                currentDynamicQuality = sceneSettings.dynamicQuality;
+                currentMovingAntiAliasingLevel = sceneSettings.movingAntiAliasingLevel;
+                currentMovingTextureQuality = sceneSettings.movingTextureQuality;
+                currentMovingVisualQuality = sceneSettings.movingVisualQuality;
+                currentMovingShadowQuality = sceneSettings.movingShadowQuality;
+                currentMovingShadowResolution = sceneSettings.movingShadowResolution;
+                currentStandingAntiAliasingLevel = sceneSettings.standingAntiAliasingLevel;
+                currentStandingTextureQuality = sceneSettings.standingTextureQuality;
+                currentStandingVisualQuality = sceneSettings.standingVisualQuality;
+                currentStandingShadowQuality = sceneSettings.standingShadowQuality;
+                currentStandingShadowResolution = sceneSettings.standingShadowResolution;
+            }
+            else
+            {
+                SetSceneSettingsToDefaults();              
             }
         }
     }
