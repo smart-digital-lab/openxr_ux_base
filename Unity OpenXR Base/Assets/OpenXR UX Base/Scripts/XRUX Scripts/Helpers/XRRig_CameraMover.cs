@@ -193,7 +193,7 @@ public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
         if (thePlayer != null) thePlayer.transform.localPosition = Vector3.zero;
 
         RaycastHit hit;
-        bool answer = (Physics.Raycast(new Vector3(transform.position.x, transform.position.y + 1.0f, transform.position.z), -Vector3.up, out hit, 2.0f, 1<<7));
+        bool answer = (Physics.Raycast(new Vector3(transform.position.x, transform.position.y + 1.0f, transform.position.z), -Vector3.up, out hit, 2.0f, 1<<(int)OpenXR_UX_Layers.Go_Areas));
         if (answer)
         {
             transform.position = hit.point;
@@ -255,7 +255,7 @@ public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
         float headHeight = (theHead == null) ? 2.0f : theHead.transform.position.y - transform.position.y;
 
         // Raycast down from where we are going to be
-        return (Physics.Raycast(new Vector3(nextStep.x, nextStep.y + headHeight, nextStep.z), -Vector3.up, headHeight + 0.1f, 1<<8));
+        return (Physics.Raycast(new Vector3(nextStep.x, nextStep.y + headHeight, nextStep.z), -Vector3.up, headHeight + 0.1f, 1<<(int)OpenXR_UX_Layers.NoGo_Areas));
     }
     private bool ObstacleCheckForward(Vector3 position, Vector3 direction)
     {
@@ -266,7 +266,7 @@ public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
         return (Physics.Raycast(
             new Vector3(position.x, position.y + headHeight, position.z), 
             new Vector3(direction.x, 0.0f, direction.z), 
-            Vector3.Magnitude(direction) * 10.0f, 1<<8));
+            Vector3.Magnitude(direction) * 10.0f, 1<<(int)OpenXR_UX_Layers.NoGo_Areas));
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -279,7 +279,7 @@ public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
     {
         RaycastHit hit;
         float headHeight = (theHead == null) ? 2.0f : theHead.transform.position.y - transform.position.y;
-        bool answer =  (Physics.Raycast(new Vector3(position.x, position.y + headHeight, position.z), -Vector3.up, out hit, headHeight + 0.5f, 1<<7));
+        bool answer =  (Physics.Raycast(new Vector3(position.x, position.y + headHeight, position.z), -Vector3.up, out hit, headHeight + 0.5f, 1<<(int)OpenXR_UX_Layers.Go_Areas));
         if (answer)
         {
             height = hit.point.y - position.y;

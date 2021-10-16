@@ -95,12 +95,12 @@ public class XRRig_Pointer : MonoBehaviour, _XRRig_Pointer
         {
             Vector3 fwd = transform.TransformDirection(Vector3.forward);
             RaycastHit hit;
-            if (Physics.Raycast(transform.position, fwd, out hit, 100, 1<<6 | 1<<7 | 1<<8))
+            if (Physics.Raycast(transform.position, fwd, out hit, 100, 1<<(int)OpenXR_UX_Layers.OpenXR_UX | 1<<(int)OpenXR_UX_Layers.Go_Areas | 1<<(int)OpenXR_UX_Layers.NoGo_Areas))
             {
                 int theLayer = hit.collider.gameObject.layer;
                 switch (theLayer)
                 {
-                    case 6:
+                    case (int)OpenXR_UX_Layers.OpenXR_UX:
                         Marker.transform.position = hit.point;
                         Marker.transform.localScale = markerOriginalSize;
                         Marker.SetActive(true);
@@ -115,7 +115,7 @@ public class XRRig_Pointer : MonoBehaviour, _XRRig_Pointer
                         }
                         trail.SetPositions(trailPoints);
                         break;
-                    case 7:
+                    case (int)OpenXR_UX_Layers.Go_Areas:
                         Marker.transform.position = hit.point;
                         Marker.transform.localScale = markerOriginalSize * 30.0f;
                         isTouching = false;

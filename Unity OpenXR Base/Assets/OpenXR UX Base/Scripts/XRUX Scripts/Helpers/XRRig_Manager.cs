@@ -341,10 +341,10 @@ public static class XRRig
         get
         {
             // Find the object that has the event manager on it.  It should be the only one with tag XREvents.
-            GameObject watcherGameObject = GameObject.FindWithTag("XREvents");
+            GameObject watcherGameObject = GameObject.FindWithTag(Enum.GetName(typeof(OpenXR_UX_Tags), OpenXR_UX_Tags.XREvents));
             if (watcherGameObject == null)
             {
-                Debug.Log("There is no XRRig_Manager in the SceneGraph that is tagged XREvents.");
+                Debug.Log("There is no XRRig Manager in the SceneGraph that is tagged XREvents.");
                 return null;
             }
             else

@@ -15,6 +15,9 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.XR;
 
+public enum OpenXR_UX_Layers { OpenXR_UX = 6, Go_Areas, NoGo_Areas, Player, Other_Players }
+public enum OpenXR_UX_Tags { XREvents, XRLeft, XRRight }
+
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 // XRData that is used as events that are sent between XR Modules
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
