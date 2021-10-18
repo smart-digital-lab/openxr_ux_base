@@ -190,7 +190,7 @@ public class XRRig_Pointer : MonoBehaviour, _XRRig_Pointer
     void OnDisable()
     {
         if (Marker != null) Marker.SetActive(false);
-        trail.enabled = false;
+        if (trail != null) trail.enabled = false;
     }
     void OnEnable()
     {

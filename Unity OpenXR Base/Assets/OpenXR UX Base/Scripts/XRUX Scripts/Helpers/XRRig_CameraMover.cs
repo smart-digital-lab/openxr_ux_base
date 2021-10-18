@@ -37,6 +37,7 @@ public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
     public enum MovementStyle   { teleportToMarker, moveToMarker }
     public enum MovementHand    { Left, Right }
     public enum MovementDevice  { Head, Controller }
+    public enum XRType { Immersive_XR, Desktop_XR }
 
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Public variables
@@ -94,12 +95,12 @@ public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Private variables
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    private XRType XRMode = XRType.Immersive_XR;
     private Vector3 velocity;
     private Vector3 acceleration;
     private float angularVelocity;
     private float angularAcceleration;
     private float hitFrictionFactor = 0.0f; // Between 0.0f and 0.5f
-    //private float prevHitFrictionTime = 0.0f;
     private bool movingToTarget = false;
     private bool fadingInAndOut = false;
     private float startFadeTime;
@@ -108,6 +109,9 @@ public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
     private float startFlyingTime;
     private bool flying = false;
     private bool moved = false;
+    private Vector3 markerOriginalSize;
+    private bool isMovingTo = false;
+    private bool isTouching = false;
 
     private bool currentlyHighQuality = false;
 
@@ -122,6 +126,17 @@ public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
     private SceneSettingsVisualQuality currentStandingVisualQuality;
     private ShadowQuality currentStandingShadowQuality;
     private ShadowResolution currentStandingShadowResolution;
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    void Awake()
+    {
+        markerOriginalSize = rightMarker.transform.localScale;
+        XRMode = (XRSettings.isDeviceActive) ? XRType.Immersive_XR : XRType.Desktop_XR;      
+    }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -198,10 +213,17 @@ public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
         {
             transform.position = hit.point;
         }
-        // else
-        // {
-        //     transform.position = Vector3.zero;         
-        // }   
+
+        if (XRMode == XRType.Desktop_XR)
+        {
+            if (theHead != null) theHead.transform.localPosition = new Vector3(0, 1.5f, 0);
+            Camera.main.fieldOfView = 60.0f;
+            rightMarker.SetActive(false);
+        }
+        else
+        {
+            Camera.main.fieldOfView = 26.99147f; // This number comes from the default setting for OpenXR
+        }
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -215,7 +237,7 @@ public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
         // Calculate the amount of fade
         float t = (Time.time - startFadeTime) / teleportFadeTime;
         float newAlpha = 0.0f;
-        if ((t > 0.0f) && (t <= 0.5f))
+        if ((t >= 0.0f) && (t <= 0.5f))
         {
             // Fade to opaque
             newAlpha = Mathf.Lerp(0.0f, 1.0f, t * 2.0f);
@@ -294,6 +316,13 @@ public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
 
 
 
+    string VectorString (Vector3 theVector)
+    {
+        return ("[ " + theVector.x.ToString() + ", "+ theVector.y.ToString() + ", "+ theVector.z.ToString() + " ]");
+    }
+
+
+
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Make the movements and rotations
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -351,9 +380,11 @@ public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
         // Friction is used to slow the movement once no controls are being pushed
         Vector3 friction = new Vector3(
             velocity.x * (0.5f + hitFrictionFactor) * Time.deltaTime,
-            velocity.y * (0.5f + hitFrictionFactor / 2.0f) * Time.deltaTime,  // Less friction in the vertical
+            velocity.y * (0.5f + hitFrictionFactor) * Time.deltaTime,  
             velocity.z * (0.5f + hitFrictionFactor) * Time.deltaTime
         );
+
+        Debug.Log("a=" + VectorString(acceleration) + "  f=" + VectorString(friction) + "  v=" + VectorString(velocity));
 
         // The velocity change is the previous velocity + the change through acceleration - friction
         velocity = velocity + deltaVelocity - friction;
@@ -401,20 +432,6 @@ public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
         }
         else
         {
-            // Check if we're are getting close to a no-go area
-            // if (ObstacleCheckDown(transform.position, velocity * 10.0f) || ObstacleCheckForward(transform.position, velocity * 10.0f))
-            // {
-            //     hitFrictionFactor = 10.0f;
-            //     acceleration = Vector3.zero;
-            //     prevHitFrictionTime = Time.time;
-            // }
-            // else
-            // {
-            //     // Decelerate the friction slowly in case the object we hit is quite small and we end up checking positions past the object.
-            //     float t = (Time.time - prevHitFrictionTime) / 2.0f; 
-            //     hitFrictionFactor = Mathf.SmoothStep(10.0f, 0.0f, t);
-            // }
-
             // Move there if there are no obstacles, otherwise stop moving.
             if (ObstacleCheckDown(transform.position, velocity) || ObstacleCheckForward(transform.position, velocity))
             {
@@ -480,6 +497,73 @@ public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
         // Work out rotation
         angularVelocity = angularVelocity + (angularAcceleration * Time.deltaTime * rotationAccelerationFactor) + (angularVelocity * Time.deltaTime * -rotationFrictionFactor);
         transform.Rotate(0.0f, angularVelocity, 0.0f);
+
+        // Set head movements and track a marker with the mouse in Desktop mode
+        if (XRMode == XRType.Desktop_XR)
+        {
+            RaycastHit hit;
+
+            // Head Movement
+            Vector3 mousePos = Input.mousePosition;
+            float xpos = Mathf.Clamp((Input.mousePosition.x - Screen.width / 2.0f) / (Screen.width / 2.0f), -1.0f, 1.0f);
+            float ypos = Mathf.Clamp((Input.mousePosition.y - Screen.height / 2.0f) / (Screen.height / 2.0f), -1.0f, 1.0f);
+
+            theHead.transform.localRotation = Quaternion.Euler(ypos * -30.0f, xpos * 45.0f, 0.0f);
+
+            Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
+            if (Physics.Raycast(ray, out hit, 100, 1<<(int)OpenXR_UX_Layers.OpenXR_UX | 1<<(int)OpenXR_UX_Layers.Go_Areas | 1<<(int)OpenXR_UX_Layers.NoGo_Areas))
+            {
+                int theLayer = hit.collider.gameObject.layer;
+                switch (theLayer)
+                {
+                    case (int)OpenXR_UX_Layers.OpenXR_UX:
+                        rightMarker.transform.position = hit.point;
+                        rightMarker.transform.localScale = markerOriginalSize;
+                        rightMarker.SetActive(true);
+                        isTouching = true;
+                        isMovingTo = false;
+                        // trail.enabled = true;
+                        // trail.startWidth = 0.005f;
+                        // trail.endWidth = 0.001f;
+                        // for (int i = 0; i < trailDensity; i++)
+                        // {
+                        //     trailPoints[i] = TravelCurve(transform.position, Marker.transform.position, 0.0f, ((i * 1.0f) / (trailDensity  * 1.0f)), Vector3.up);
+                        // }
+                        // trail.SetPositions(trailPoints);
+                        break;
+                    case (int)OpenXR_UX_Layers.Go_Areas:
+                        rightMarker.transform.position = hit.point;
+                        rightMarker.transform.localScale = markerOriginalSize * 30.0f;
+                        isTouching = false;
+                        isMovingTo = true;
+                        rightMarker.SetActive(true);
+                        // trail.enabled = true;
+                        // trail.startWidth = 0.002f;
+                        // trail.endWidth = 0.1f;
+                        // for (int i = 0; i < trailDensity; i++)
+                        // {
+                        //     trailPoints[i] = TravelCurve(transform.position, Marker.transform.position, 0.3f, (((i + 1) * 1.0f) / ((trailDensity + 2) * 1.0f)), Vector3.up);
+                        // }
+                        // trail.SetPositions(trailPoints);
+                        break;
+                    default:
+                        rightMarker.transform.localPosition = Vector3.zero;
+                        rightMarker.transform.localScale = markerOriginalSize;
+                        rightMarker.SetActive(false);
+                        isTouching = false;
+                        isMovingTo = false;
+                        // trail.enabled = false;
+                        break;
+                }
+            }
+            else
+            {
+                rightMarker.transform.localPosition = Vector3.zero;
+                rightMarker.transform.localScale = markerOriginalSize;
+                rightMarker.SetActive(false);                
+                // trail.enabled = false;
+            }
+        }
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -512,27 +596,45 @@ public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
 
             if (theEvent.eventBool)
             {
-                if ((marker != null) && (pointer != null))
+                if (XRMode == XRType.Desktop_XR)
                 {
-                    XRRig_Pointer pointerScript = pointer.GetComponent<XRRig_Pointer>();
-                    if (pointerScript != null)
+                    if (isMovingTo)
                     {
-                        if (pointerScript.IsMovingTo)
+                        movingToTarget = true;
+                        targetDestination = rightMarker.transform.position;
+                        if (movementStyle == MovementStyle.teleportToMarker)
                         {
-                            movingToTarget = true;
-                            targetDestination = marker.transform.position;
-                            if (movementStyle == MovementStyle.teleportToMarker)
+                            if (teleportFader != null) teleportFader.SetActive(true);
+                            startFadeTime = Time.time;
+                            fadingInAndOut = true;
+                        }
+                    }
+                    else movingToTarget = false;                    
+                }
+                else
+                {
+                    if ((marker != null) && (pointer != null))
+                    {
+                        XRRig_Pointer pointerScript = pointer.GetComponent<XRRig_Pointer>();
+                        if (pointerScript != null)
+                        {
+                            if (pointerScript.IsMovingTo)
                             {
-                                if (teleportFader != null) teleportFader.SetActive(true);
-                                startFadeTime = Time.time;
-                                fadingInAndOut = true;
+                                movingToTarget = true;
+                                targetDestination = marker.transform.position;
+                                if (movementStyle == MovementStyle.teleportToMarker)
+                                {
+                                    if (teleportFader != null) teleportFader.SetActive(true);
+                                    startFadeTime = Time.time;
+                                    fadingInAndOut = true;
+                                }
                             }
+                            else movingToTarget = false;
                         }
                         else movingToTarget = false;
                     }
                     else movingToTarget = false;
                 }
-                else movingToTarget = false;
             }
         }
     }
@@ -573,7 +675,7 @@ public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
             {
                 if (movementPointer == MovementDevice.Head)
                 {
-                    // Move in the direction of the head
+                    // Move in the direction of the head (ie the main camera)
                     acceleration = Camera.main.gameObject.transform.forward * Mathf.Sign(thumbstickMovement.y) * 0.01f;
                 }
                 else
@@ -614,10 +716,15 @@ public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
                 // Move up or down
                 if (Mathf.Abs(thumbstickMovement.y) > 0.5f)
                 {
-                    acceleration = new Vector3(acceleration.x, Mathf.Sign(thumbstickMovement.y) * 0.005f, acceleration.z);
+                    acceleration = new Vector3(acceleration.x, Mathf.Sign(thumbstickMovement.y) * 0.01f, acceleration.z);
+                }
+                else
+                {
+                    acceleration = new Vector3(acceleration.x, 0.0f, acceleration.z);
                 }
 
-                if (thumbstickMovement.y > 0.5)
+                // if (thumbstickMovement.y > 0.5)
+                if ((acceleration.y > 0.0f) && !flying)
                 {
                     flying = true;
                     startFlyingTime = Time.time;
@@ -642,6 +749,11 @@ public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
                 flying = true;
                 startFlyingTime = Time.time;
                 hitFrictionFactor = 0.0f;
+                if (movingToTarget)
+                {
+                    if (teleportFader != null) teleportFader.SetActive(false);
+                    movingToTarget = false;
+                }
             }
         }
     }

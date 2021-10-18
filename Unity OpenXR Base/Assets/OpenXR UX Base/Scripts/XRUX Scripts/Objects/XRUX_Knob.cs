@@ -75,7 +75,8 @@ public class XRUX_Knob : MonoBehaviour, _XRUX_Knob
     private Collider otherCollider; // The collider that hits the knob - we need this to determine the rotation.  Usually one of the pointers.
     private float clickedOnValue = 0.0f; // What the value was when the knob is clicked on.
     private float startRotation = 0.0f; // The starting rotation of the other collider.
-    private float currentValue = 0.0f; // The current angle of rotation (degrees).
+    private float currentRotation = 0.0f; // The current angle of rotation (degrees).
+    private float currentSteppedValue = 0.0f; // The stepped value (mostly used when under mouse control)
     private float prevSteppedValue = 0.0f; // The previous value sent as an event.
     private bool firstTime = true; // First time running?
     private bool isLeft = false;
@@ -85,7 +86,7 @@ public class XRUX_Knob : MonoBehaviour, _XRUX_Knob
 
 
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    // Rotate the knob to the given value (in the range given by the min, max and step values)
+    // Rotate the knob to the given value (in the range given by the 0, max and step values)
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     public void Input (XRData newData)
     {
@@ -108,7 +109,7 @@ public class XRUX_Knob : MonoBehaviour, _XRUX_Knob
         }
 
         // Save the value for next time
-        currentValue = prevSteppedValue = steppedValue;
+        currentRotation = prevSteppedValue = steppedValue;
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -148,11 +149,12 @@ public class XRUX_Knob : MonoBehaviour, _XRUX_Knob
         {
             if (otherCollider != null)
             {
+                Debug.Log("Rotating");
                 // Get the angle of rotation of the collided item (usually a pointer)
-                currentValue = clickedOnValue + (otherCollider.gameObject.transform.rotation.eulerAngles.z - startRotation) * 2.0f;
+                currentRotation = clickedOnValue + (otherCollider.gameObject.transform.rotation.eulerAngles.z - startRotation) * 2.0f;
 
                 // Normalise that value (to between 0 and 1)
-                float normalizedValue = (1.0f - (currentValue % 360.0f) / 360.0f);
+                float normalizedValue = (1.0f - (currentRotation % 360.0f) / 360.0f);
                 // Limit it to between min and max
                 float limitedValue = (normalizedValue * maxValue) % maxValue;
 
@@ -168,7 +170,6 @@ public class XRUX_Knob : MonoBehaviour, _XRUX_Knob
                 if ((prevSteppedValue != steppedValue) || firstTime)
                 {
                     if (onChange != null) onChange.Invoke(new XRData(steppedValue));
-                    Debug.Log("OPENXRUX - Knob Rotated : " + steppedValue);
                 }
 
                 // Save the value for next time
@@ -247,7 +248,7 @@ public class XRUX_Knob : MonoBehaviour, _XRUX_Knob
             {
                 clicked = true;
                 objectToColor.material = activatedMaterial;
-                clickedOnValue = currentValue;
+                clickedOnValue = currentRotation;
                 startRotation = otherCollider.gameObject.transform.rotation.eulerAngles.z;
             }
             else
@@ -255,6 +256,17 @@ public class XRUX_Knob : MonoBehaviour, _XRUX_Knob
                 clicked = false;
                 objectToColor.material = touchedMaterial;
             }
+        }
+
+        if ((theEvent.eventType == XRDeviceEventTypes.mouse_scroll) && (theEvent.eventAction == XRDeviceActions.UP) && touched)
+        {
+            float newSteppedValue = prevSteppedValue + step;
+            Input(new XRData((newSteppedValue >= maxValue) ? 0 : newSteppedValue));
+        }
+        if ((theEvent.eventType == XRDeviceEventTypes.mouse_scroll) && (theEvent.eventAction == XRDeviceActions.DOWN) && touched)
+        {
+            float newSteppedValue = prevSteppedValue - step;
+            Input(new XRData((newSteppedValue < 0) ? maxValue : newSteppedValue));
         }
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
