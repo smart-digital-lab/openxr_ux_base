@@ -358,29 +358,29 @@ public class XRRig_Manager : MonoBehaviour, _XRRig_Manager
         {
             // Probably running in standalone mode, so check keyboard instead
             // Right Hand Thumbstick using arrow keys
-            if (Input.GetKeyDown(KeyCode.UpArrow)) SendVectorEvent(XRDeviceEventTypes.right_thumbstick, new Vector2(0, 1));
+            if (Input.GetKey(KeyCode.UpArrow)) SendVectorEvent(XRDeviceEventTypes.right_thumbstick, new Vector2(0, 1));
             if (Input.GetKeyUp(KeyCode.UpArrow)) SendVectorEvent(XRDeviceEventTypes.right_thumbstick, new Vector2(0, 0));
 
-            if (Input.GetKeyDown(KeyCode.DownArrow)) SendVectorEvent(XRDeviceEventTypes.right_thumbstick, new Vector2(0, -1));
+            if (Input.GetKey(KeyCode.DownArrow)) SendVectorEvent(XRDeviceEventTypes.right_thumbstick, new Vector2(0, -1));
             if (Input.GetKeyUp(KeyCode.DownArrow)) SendVectorEvent(XRDeviceEventTypes.right_thumbstick, new Vector2(0, 0));
 
-            if (Input.GetKeyDown(KeyCode.LeftArrow)) SendVectorEvent(XRDeviceEventTypes.right_thumbstick, new Vector2(-1, 0));
+            if (Input.GetKey(KeyCode.LeftArrow)) SendVectorEvent(XRDeviceEventTypes.right_thumbstick, new Vector2(-1, 0));
             if (Input.GetKeyUp(KeyCode.LeftArrow)) SendVectorEvent(XRDeviceEventTypes.right_thumbstick, new Vector2(0, 0));
             
-            if (Input.GetKeyDown(KeyCode.RightArrow)) SendVectorEvent(XRDeviceEventTypes.right_thumbstick, new Vector2(1, 0));
+            if (Input.GetKey(KeyCode.RightArrow)) SendVectorEvent(XRDeviceEventTypes.right_thumbstick, new Vector2(1, 0));
             if (Input.GetKeyUp(KeyCode.RightArrow)) SendVectorEvent(XRDeviceEventTypes.right_thumbstick, new Vector2(0, 0));
 
             // Left Hand Thumbstick using wasd keys
-            if (Input.GetKeyDown(KeyCode.W)) SendVectorEvent(XRDeviceEventTypes.left_thumbstick, new Vector2(0, 1));
+            if (Input.GetKey(KeyCode.W)) SendVectorEvent(XRDeviceEventTypes.left_thumbstick, new Vector2(0, 1));
             if (Input.GetKeyUp(KeyCode.W)) SendVectorEvent(XRDeviceEventTypes.left_thumbstick, new Vector2(0, 0));
 
-            if (Input.GetKeyDown(KeyCode.S)) SendVectorEvent(XRDeviceEventTypes.left_thumbstick, new Vector2(0, -1));
+            if (Input.GetKey(KeyCode.S)) SendVectorEvent(XRDeviceEventTypes.left_thumbstick, new Vector2(0, -1));
             if (Input.GetKeyUp(KeyCode.S)) SendVectorEvent(XRDeviceEventTypes.left_thumbstick, new Vector2(0, 0));
 
-            if (Input.GetKeyDown(KeyCode.A)) SendVectorEvent(XRDeviceEventTypes.left_thumbstick, new Vector2(-1, 0));
+            if (Input.GetKey(KeyCode.A)) SendVectorEvent(XRDeviceEventTypes.left_thumbstick, new Vector2(-1, 0));
             if (Input.GetKeyUp(KeyCode.A)) SendVectorEvent(XRDeviceEventTypes.left_thumbstick, new Vector2(0, 0));
             
-            if (Input.GetKeyDown(KeyCode.D)) SendVectorEvent(XRDeviceEventTypes.left_thumbstick, new Vector2(1, 0));
+            if (Input.GetKey(KeyCode.D)) SendVectorEvent(XRDeviceEventTypes.left_thumbstick, new Vector2(1, 0));
             if (Input.GetKeyUp(KeyCode.D)) SendVectorEvent(XRDeviceEventTypes.left_thumbstick, new Vector2(0, 0));
 
             // Mouse button left button = right hand trigger and right button = right hand grip

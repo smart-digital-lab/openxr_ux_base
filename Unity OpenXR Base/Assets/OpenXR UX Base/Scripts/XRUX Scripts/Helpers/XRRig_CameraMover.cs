@@ -62,6 +62,7 @@ public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
     public bool otherThumbstickForHeight = true;
     [Header("Movement Parameters")]
     public float accelerationFactor = 1.0f;
+    public float maximumVelocity = 0.05f;
     public float maximumFlyingHeight = 20.0f;
     [Header("Rotation Parameters")]
     public float rotationFrictionFactor = 0.5f;
@@ -316,13 +317,6 @@ public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
 
 
 
-    string VectorString (Vector3 theVector)
-    {
-        return ("[ " + theVector.x.ToString() + ", "+ theVector.y.ToString() + ", "+ theVector.z.ToString() + " ]");
-    }
-
-
-
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Make the movements and rotations
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -384,13 +378,11 @@ public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
             velocity.z * (0.5f + hitFrictionFactor) * Time.deltaTime
         );
 
-        Debug.Log("a=" + VectorString(acceleration) + "  f=" + VectorString(friction) + "  v=" + VectorString(velocity));
-
         // The velocity change is the previous velocity + the change through acceleration - friction
         velocity = velocity + deltaVelocity - friction;
 
         // limit the velocity so we don't go shooting away really fast and make people nauseous
-        velocity = Vector3.ClampMagnitude ( velocity, 0.05f );
+        velocity = Vector3.ClampMagnitude ( velocity, maximumVelocity );
 
         // Work out the potential new position
         newPosition = transform.position + velocity;
