@@ -8,18 +8,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
 using System.Text;
-
-
-[System.Serializable]
-public class SocketMessage {
-    public Hashtable data;
-}
+using JSONEncoderDecoder;
 
 
 public class Websockets : MonoBehaviour
 {
+    public string serverAddress = "localhost";
     private ClientWebSocket socket = new ClientWebSocket();
-    private string endpoint = "ws://localhost:8080/comms";
+    private string endpoint = "ws://" + serverAddress + ":8080/comms";
     private Task receiveTask;
 
     private bool commandReady = false;
@@ -53,7 +49,7 @@ public class Websockets : MonoBehaviour
     {
         if (socket.State == WebSocketState.Open)
         {
-            String connection_message = "{\"Fred\":{\"cube\":{\"connect\":{}}}}";
+            String connection_message = "{\"connect\":[\"Fred\"]}";
             await socket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(connection_message)), WebSocketMessageType.Text, true, CancellationToken.None);
         }
     }
@@ -84,28 +80,42 @@ public class Websockets : MonoBehaviour
                     using (var reader = new StreamReader(stream, Encoding.UTF8))
                     {
                         string message = reader.ReadToEnd();
-                        Debug.Log (message);
+                        // Debug.Log (message);
 
-                        SocketMessage theMessage = JsonUtility.FromJson<SocketMessage>(message);
-
-                        Debug.Log(JsonUtility.ToJson(theMessage));
-
-                        // switch (theMessage.data.command)
-                        // {
-                        //     case "rotation": 
-                        //         Debug.Log("rotating");
-                        //         newRotation = new Vector3(theMessage.data.vect3[0], theMessage.data.vect3[1], theMessage.data.vect3[2]);
-                        //         Debug.Log(newRotation);
-                        //         commandReady = true;
-                        //         break;
-                        //     default:
-                        //         break;
-                        // }                       
+                        Hashtable messageHash = (Hashtable) JSON.JsonDecode(message);
+                        if (messageHash == null) break;
+                        ArrayList messageData = (ArrayList) messageHash["data"];
+                        if (messageData == null) break;
+                        switch ((string) messageData[2])
+                        {
+                            case "rotation": 
+                                // Debug.Log("rotating");
+                                ArrayList messageRotation = (ArrayList) messageData[4];
+                                if (messageRotation == null) break;
+                                
+                                newRotation = Convert2Vector3(messageRotation);
+                                // Debug.Log(newRotation);
+                                commandReady = true;
+                                break;
+                            default:
+                                break;
+                        }                       
                     }
                 }
             }
         }
         Debug.Log("Websocket Closed");
+    }
+
+
+
+    Vector3 Convert2Vector3(ArrayList data)
+    {
+        float x, y, z = 0.0f;
+        float.TryParse(data[0].ToString(), out x);
+        float.TryParse(data[1].ToString(), out y);
+        float.TryParse(data[2].ToString(), out z);
+        return new Vector3(x,y,z);
     }
 
 
