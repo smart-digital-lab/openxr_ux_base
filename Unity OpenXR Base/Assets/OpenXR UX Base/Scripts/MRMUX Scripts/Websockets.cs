@@ -10,21 +10,25 @@ using System.IO;
 using System.Text;
 using JSONEncoderDecoder;
 
-
 public class Websockets : MonoBehaviour
 {
     public string serverAddress = "localhost";
     private ClientWebSocket socket = new ClientWebSocket();
-    private string endpoint = "ws://" + serverAddress + ":8080/comms";
+    private string endpoint;
+    private string productName;
     private Task receiveTask;
 
     private bool commandReady = false;
-    private Vector3 newRotation;
+    private XRMXData newData;
 
 
     // Start is called before the first frame update
     async void Start()
     {
+        endpoint = "ws://" + serverAddress + ":8080/comms";
+        productName = Application.companyName + "." + Application.productName + "." + Application.version;
+        Debug.Log(productName);
+
         await Initialize();
     }
 
@@ -49,7 +53,7 @@ public class Websockets : MonoBehaviour
     {
         if (socket.State == WebSocketState.Open)
         {
-            String connection_message = "{\"connect\":[\"Fred\"]}";
+            String connection_message = "{\"connect\":[\"" + productName + "\"]}";
             await socket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(connection_message)), WebSocketMessageType.Text, true, CancellationToken.None);
         }
     }
@@ -79,27 +83,49 @@ public class Websockets : MonoBehaviour
                     stream.Seek(0, SeekOrigin.Begin);
                     using (var reader = new StreamReader(stream, Encoding.UTF8))
                     {
+                        // Raw Message
                         string message = reader.ReadToEnd();
-                        // Debug.Log (message);
 
+                        Debug.Log(message);
+
+                        // Message to JSON format - should be a JSON object { "command": data }
                         Hashtable messageHash = (Hashtable) JSON.JsonDecode(message);
                         if (messageHash == null) break;
-                        ArrayList messageData = (ArrayList) messageHash["data"];
-                        if (messageData == null) break;
-                        switch ((string) messageData[2])
+
+                        if (messageHash["data"] != null)
                         {
-                            case "rotation": 
-                                // Debug.Log("rotating");
-                                ArrayList messageRotation = (ArrayList) messageData[4];
-                                if (messageRotation == null) break;
-                                
-                                newRotation = Convert2Vector3(messageRotation);
-                                // Debug.Log(newRotation);
-                                commandReady = true;
-                                break;
-                            default:
-                                break;
-                        }                       
+                            // Data should be a JSON array with 5 items [appname, objectname, parameter, type, value]
+                            ArrayList messageData = (ArrayList) messageHash["data"];
+                            if (messageData == null) break;
+
+                            newData = new XRMXData(messageData, XRMXData.XRMXDataDirection.IN);
+                            commandReady = true;                            
+                        }
+
+                        // Get the first key
+                        // string command = "";
+                        // IList iList = messageHash.Keys as IList;
+                        // if (iList != null)
+                        // {
+                        //     command = (string) iList[0];
+                        // }
+
+                        // Debug.Log(command);
+
+                        // switch (command)
+                        // {
+                        //     case "data":
+                        //         // Data should be a JSON array with 5 items [appname, objectname, parameter, type, value]
+                        //         ArrayList messageData = (ArrayList) messageHash["data"];
+                        //         if (messageData == null) break;
+
+                        //         newData = new XRMXData(messageData, XRMXData.XRMXDataDirection.IN);
+                        //         commandReady = true;
+
+                        //         break;
+                        //     default:
+                        //         break;
+                        // }                 
                     }
                 }
             }
@@ -109,23 +135,14 @@ public class Websockets : MonoBehaviour
 
 
 
-    Vector3 Convert2Vector3(ArrayList data)
-    {
-        float x, y, z = 0.0f;
-        float.TryParse(data[0].ToString(), out x);
-        float.TryParse(data[1].ToString(), out y);
-        float.TryParse(data[2].ToString(), out z);
-        return new Vector3(x,y,z);
-    }
-
-
-
     // Update is called once per frame
     void Update()
     {
         if (commandReady)
         {
-            transform.rotation = Quaternion.Euler(newRotation);
+            Debug.Log("Data being sent to object");
+            //XRMXEventQueue.Invoke(newData);
+            commandReady = false;
         }
     }
 
