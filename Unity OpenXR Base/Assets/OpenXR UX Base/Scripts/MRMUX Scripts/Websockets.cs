@@ -1,3 +1,13 @@
+/**********************************************************************************************************************************************************
+ * Websockets
+ * ----------
+ *
+ * 2021-11-09
+ *
+ * The main class for dealing with WebSockets and Unity Events to send and receive data to and from the websocket to the MRMux Server.
+ *
+ * Roy Davies, Smart Digital Lab, University of Auckland.
+ **********************************************************************************************************************************************************/
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,26 +18,57 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
 using System.Text;
+using UnityEngine.Events;
 using JSONEncoderDecoder;
 
+
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------
+// The type of data that can be sent via the XRMux Event
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------
+[Serializable]
+public class XRMuxEvent
+{
+    public XRMuxData data;
+}
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------
+// The unity event queue for XRMux events
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------
+[Serializable]
+public class XRMuxEvents : UnityEvent<XRMuxEvent> { };
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------
+// Main Class
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------
 public class Websockets : MonoBehaviour
 {
+
+    public XRMuxEvents XRMuxEventQueue; // The event queue that all the XRMux elements will need to look at to get events.
+
     public string serverAddress = "localhost";
+    public string serverPort = "8810";
     private ClientWebSocket socket = new ClientWebSocket();
     private string endpoint;
     private string productName;
     private Task receiveTask;
 
-    private bool commandReady = false;
-    private XRMXData newData;
+    private bool eventReady = false;
+    private XRMuxData newData;
 
 
     // Start is called before the first frame update
     async void Start()
     {
-        endpoint = "ws://" + serverAddress + ":8080/comms";
+        endpoint = "ws://" + serverAddress + ":" + serverPort + "/comms";
         productName = Application.companyName + "." + Application.productName + "." + Application.version;
-        Debug.Log(productName);
+        if (XRMux.EventQueue != null) XRMux.EventQueue.AddListener(onDeviceEvent);
 
         await Initialize();
     }
@@ -97,35 +138,11 @@ public class Websockets : MonoBehaviour
                             // Data should be a JSON array with 5 items [appname, objectname, parameter, type, value]
                             ArrayList messageData = (ArrayList) messageHash["data"];
                             if (messageData == null) break;
+                            if (messageData.Count < 5) break;
 
-                            newData = new XRMXData(messageData, XRMXData.XRMXDataDirection.IN);
-                            commandReady = true;                            
-                        }
-
-                        // Get the first key
-                        // string command = "";
-                        // IList iList = messageHash.Keys as IList;
-                        // if (iList != null)
-                        // {
-                        //     command = (string) iList[0];
-                        // }
-
-                        // Debug.Log(command);
-
-                        // switch (command)
-                        // {
-                        //     case "data":
-                        //         // Data should be a JSON array with 5 items [appname, objectname, parameter, type, value]
-                        //         ArrayList messageData = (ArrayList) messageHash["data"];
-                        //         if (messageData == null) break;
-
-                        //         newData = new XRMXData(messageData, XRMXData.XRMXDataDirection.IN);
-                        //         commandReady = true;
-
-                        //         break;
-                        //     default:
-                        //         break;
-                        // }                 
+                            newData = new XRMuxData(messageData, XRMuxData.XRMuxDataDirection.IN);
+                            eventReady = true;                            
+                        }            
                     }
                 }
             }
@@ -135,16 +152,39 @@ public class Websockets : MonoBehaviour
 
 
 
-    // Update is called once per frame
-    void Update()
+    private void onDeviceEvent(XRMuxEvent theEvent)
     {
-        if (commandReady)
+        if (theEvent.data.direction == XRMuxData.XRMuxDataDirection.OUT)
         {
-            Debug.Log("Data being sent to object");
-            //XRMXEventQueue.Invoke(newData);
-            commandReady = false;
+            if (socket.State == WebSocketState.Open)
+            {
+                string message = "{\"data\":[\"" + productName + "\",\"" + theEvent.data.objectName + "\",\"" + theEvent.data.objectParameter + "\",\"" + theEvent.data.GetTypeString() + "\"," + theEvent.data.ToString() + "]}";
+                Task sendTask = Task.Run(async () => await Send(message));
+            }
         }
     }
+
+    private async Task Send(string message)
+    {
+        // Debug.Log(message);
+        await socket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(message)), WebSocketMessageType.Text, true, CancellationToken.None);        
+    }
+
+
+
+    void Update()
+    {
+        if (eventReady)
+        {
+            Debug.Log("Data being sent to object");
+            XRMuxEvent eventToSend = new XRMuxEvent();
+            eventToSend.data = newData;
+
+            XRMuxEventQueue.Invoke(eventToSend);
+            eventReady = false;
+        }
+    }
+    
 
     async void OnDestroy()
     {
@@ -155,3 +195,40 @@ public class Websockets : MonoBehaviour
         }
     }
 }
+
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------
+// Some useful static helper functions
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------
+public static class XRMux
+{
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    // Find the current Event Queue, if there is one.  Returns null if there isn't one, or the queue if it finds it.
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    public static XRMuxEvents EventQueue
+    {
+        get
+        {
+            // Find the object that has the event manager on it.  It should be the only one with tag XREvents.
+            GameObject WebSocketGameObject = GameObject.FindWithTag(Enum.GetName(typeof(OpenXR_UX_Tags), OpenXR_UX_Tags.XRMuxEvents));
+            if (WebSocketGameObject == null)
+            {
+                Debug.Log("There is no XRMux Websockets Manager in the SceneGraph that is tagged XRMuxEvents.");
+                return null;
+            }
+            else
+            {
+                Websockets websockets = WebSocketGameObject.GetComponent<Websockets>();
+                if (websockets == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    return websockets.XRMuxEventQueue;
+                }
+            }
+        }
+    }
+}
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------
