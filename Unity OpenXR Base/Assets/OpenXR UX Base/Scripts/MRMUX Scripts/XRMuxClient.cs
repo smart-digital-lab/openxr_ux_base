@@ -6,8 +6,10 @@ public class XRMuxClient : MonoBehaviour
 {
     public bool receive = true;
     public bool send = true;
+    public float rotationSpeed = 10.0f;
 
     private float prevTime;
+    private bool inControl = true;
 
     private Vector3 newLocalEulerAngles;
 
@@ -22,11 +24,8 @@ public class XRMuxClient : MonoBehaviour
 
     // Update is called once per frame
     void Update()
-    {
-        float step =  1.0f * Time.deltaTime;
-        transform.localEulerAngles = Vector3.MoveTowards(transform.localEulerAngles, newLocalEulerAngles, step);
-        
-        if (send && ((Time.time - prevTime) > 0.1f))
+    {   
+        if (send && ((Time.time - prevTime) > 0.05f))
         {
             if (transform.localEulerAngles != prevLocalRotationEuler)
             {
@@ -69,7 +68,7 @@ public class XRMuxClient : MonoBehaviour
                     case "localrotation":
                         break;
                     case "localrotationeuler":
-                        newLocalEulerAngles = theEvent.data.ToVector3();
+                        prevLocalRotationEuler = transform.localEulerAngles = theEvent.data.ToVector3();
                         break;
                     default:
                         Debug.Log ("Received uncaught event for " + theEvent.data.objectName);
