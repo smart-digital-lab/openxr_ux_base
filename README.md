@@ -7,8 +7,10 @@ If you use this library and find it useful, please let us know - we'd love to sh
 https://sdl.blogs.auckland.ac.nz 
 
 ### Usage Instructions (pdf)
-* https://github.com/smart-digital-lab/openxr_ux_unity_base/blob/main/Unity%20OpenXR%20Base/Documentation/Getting%20started%20with%20the%20SDL%20OpenXRBase%20for%20Unity.pdf
+* https://github.com/uoa-smart-digital-lab/openxr_ux_unity_base/blob/main/Unity%20OpenXR%20Base/Documentation/Getting%20started%20with%20the%20SDL%20OpenXRBase%20for%20Unity.pdf
 
+### Video Tutorials
+* https://github.com/uoa-smart-digital-lab/openxr_ux_unity_base/blob/main/TUTORIALS.md
 ### Other people's licences
 
 There are some free assets included purely for demo purposes from the Asset Store (otherwise, it would be a really boring demo).  These are:
