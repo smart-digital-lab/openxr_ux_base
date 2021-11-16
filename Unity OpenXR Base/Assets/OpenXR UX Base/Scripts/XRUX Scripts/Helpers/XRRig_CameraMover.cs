@@ -19,7 +19,7 @@ using UnityEngine.SceneManagement;
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 // Public functions
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
-public interface _XRRig_CameraMover
+public interface IXRRig_CameraMover
 {
     void PutOnBrakes();                         // Slow down all movement
     void SetMovementStyle(XRData selection);    // Set the movement style (0 = teleport, 1 = move)
@@ -32,7 +32,7 @@ public interface _XRRig_CameraMover
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 // Main class
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
-public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
+public class XRRig_CameraMover : MonoBehaviour, IXRRig_CameraMover
 {
     public enum MovementStyle   { teleportToMarker, moveToMarker }
     public enum MovementHand    { Left, Right }
@@ -42,49 +42,32 @@ public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Public variables
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    [Header("____________________________________________________________________________________________________")]
-    [Header("Move the viewer's camera in a smooth and intuitive manner.\n____________________________________________________________________________________________________")]
-    [Header("INPUTS\n\n - Data from the openXR Controllers.")]
-
-    [Header("____________________________________________________________________________________________________")]
-    [Header("SETTINGS")]
-    [Header("Teleport Style")]
     public MovementStyle movementStyle = MovementStyle.teleportToMarker;
     public GameObject teleportFader;
     public GameObject theHead;
     public GameObject thePlayer;
     public float teleportFadeTime = 2.0f;
-    [Header("Instructions")]
     public GameObject instructions;
-    [Header("Movement Control")]
     public MovementHand movementController = MovementHand.Right;
     public MovementDevice movementPointer = MovementDevice.Controller;
     public bool otherThumbstickForHeight = true;
-    [Header("Movement Parameters")]
     public float accelerationFactor = 1.0f;
     public float maximumVelocity = 0.05f;
     public float maximumFlyingHeight = 20.0f;
-    [Header("Rotation Parameters")]
     public float rotationFrictionFactor = 0.5f;
     public float rotationAccelerationFactor = 2.0f;
-    [Header("Dynamic Quality Settings")]
-    [Header("Object name in each scene with scene-specific settings.")]
     public string sceneSettingsObjectName = "ENTRY";
-    [Header("Default settings if no object with above name found in scene.")]
     public bool dynamicQuality = true;
-    [Header("When moving")]
     public SceneSettingsAntiAliasing movingAntiAliasingLevel = SceneSettingsAntiAliasing.None;
     public SceneSettingsTextureQuality movingTextureQuality = SceneSettingsTextureQuality.Eighth;
     public SceneSettingsVisualQuality movingVisualQuality = SceneSettingsVisualQuality.Medium;
     public ShadowQuality movingShadowQuality = ShadowQuality.Disable;
     public ShadowResolution movingShadowResolution = ShadowResolution.Low;
-    [Header("When standing still")]
     public SceneSettingsAntiAliasing standingAntiAliasingLevel = SceneSettingsAntiAliasing.EightTimes;
     public SceneSettingsTextureQuality standingTextureQuality = SceneSettingsTextureQuality.Full;
     public SceneSettingsVisualQuality standingVisualQuality = SceneSettingsVisualQuality.High;
     public ShadowQuality standingShadowQuality = ShadowQuality.All;
     public ShadowResolution standingShadowResolution = ShadowResolution.VeryHigh;
-    [Header("The marker and pointer objects")]
     public GameObject leftMarker;
     public GameObject rightMarker;
     public GameObject leftPointer;
@@ -112,7 +95,6 @@ public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
     private bool moved = false;
     private Vector3 markerOriginalSize;
     private bool isMovingTo = false;
-    private bool isTouching = false;
 
     private bool currentlyHighQuality = false;
 
@@ -512,7 +494,6 @@ public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
                         rightMarker.transform.position = hit.point;
                         rightMarker.transform.localScale = markerOriginalSize;
                         rightMarker.SetActive(true);
-                        isTouching = true;
                         isMovingTo = false;
                         // trail.enabled = true;
                         // trail.startWidth = 0.005f;
@@ -526,7 +507,6 @@ public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
                     case (int)OpenXR_UX_Layers.Go_Areas:
                         rightMarker.transform.position = hit.point;
                         rightMarker.transform.localScale = markerOriginalSize * 30.0f;
-                        isTouching = false;
                         isMovingTo = true;
                         rightMarker.SetActive(true);
                         // trail.enabled = true;
@@ -542,7 +522,6 @@ public class XRRig_CameraMover : MonoBehaviour, _XRRig_CameraMover
                         rightMarker.transform.localPosition = Vector3.zero;
                         rightMarker.transform.localScale = markerOriginalSize;
                         rightMarker.SetActive(false);
-                        isTouching = false;
                         isMovingTo = false;
                         // trail.enabled = false;
                         break;

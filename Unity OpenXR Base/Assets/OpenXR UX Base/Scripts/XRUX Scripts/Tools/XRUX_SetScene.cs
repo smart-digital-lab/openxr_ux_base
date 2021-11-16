@@ -19,12 +19,12 @@ using UnityEngine.XR;
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 // Public functions
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
-public interface _XRUX_SetScene
+public interface IXRUX_SetScene
 {
     void Input(XRData sceneNumber);
-    void Quality (XRData visualQuality);
-    void Antialias (XRData antiAlias);
-    void TextureLevel (XRData textureLevel);
+    // void Quality (XRData visualQuality);
+    // void Antialias (XRData antiAlias);
+    // void TextureLevel (XRData textureLevel);
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -34,25 +34,15 @@ public interface _XRUX_SetScene
 // Main class
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 [AddComponentMenu("OpenXR UX/Tools/XRUX Set Scene")]
-public class XRUX_SetScene : MonoBehaviour, _XRUX_SetScene
+public class XRUX_SetScene : MonoBehaviour, IXRUX_SetScene
 {
     public enum VisualQuality {low, medium, normal, high, extra}
 
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Public variables
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    [Header("____________________________________________________________________________________________________")]
-    [Header("Change the Scene and keep the current XRRig.\n____________________________________________________________________________________________________")]
-    [Header("INPUTS\n\n - Input() - Scene number to change to.\n - Event 'scene' and Action 'CHANGE' - From the main event queue.")]
-
-    [Header("____________________________________________________________________________________________________")]
-    [Header("SETTINGS")]
-    [Header("Scene to load on start (-1 for 'stay on this scene')")]
     public int startScene = -1;
     public bool persistAcrossScenes = true; // Whether this gameobject should persist across scenes.
-
-    [Header("____________________________________________________________________________________________________")]
-    [Header("OUTPUTS")]
     public UnityXRDataEvent onChange;   // Functions to call when scene is changed.
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -87,7 +77,7 @@ public class XRUX_SetScene : MonoBehaviour, _XRUX_SetScene
         // Listen for events coming from the XR Controllers and other devices
         if (XRRig.EventQueue != null) XRRig.EventQueue.AddListener(onDeviceEvent);
 
-        // Add the function to call when a scene cahnges
+        // Add the function to call when a scene changes
         SceneManager.sceneLoaded += OnSceneLoaded;
 
         // Load the start scene if required
@@ -96,6 +86,7 @@ public class XRUX_SetScene : MonoBehaviour, _XRUX_SetScene
             SceneManager.LoadScene(startScene % SceneManager.sceneCountInBuildSettings);
         }
             
+        // Set the starting position
         SetStartPosition();
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -109,24 +100,24 @@ public class XRUX_SetScene : MonoBehaviour, _XRUX_SetScene
     {
         Set(sceneNumber.ToInt(), sceneNumber.quietly);
     }
-    public void Quality (XRData quality)
-    {
-        visualQuality = (VisualQuality) (quality.ToInt() % 5);
-    }
-    public void Antialias (XRData antiAlias)
-    {
-        switch (antiAlias.ToInt())
-        {
-            case 0: QualitySettings.antiAliasing = 0; break;
-            case 1: QualitySettings.antiAliasing = 2; break;
-            case 3: QualitySettings.antiAliasing = 8; break;
-            default: QualitySettings.antiAliasing = 4; break;
-        }
-    }
-    public void TextureLevel (XRData textureLevel)
-    {
-        QualitySettings.masterTextureLimit = textureLevel.ToInt() % 4;
-    }
+    // public void Quality (XRData quality)
+    // {
+    //     visualQuality = (VisualQuality) (quality.ToInt() % 5);
+    // }
+    // public void Antialias (XRData antiAlias)
+    // {
+    //     switch (antiAlias.ToInt())
+    //     {
+    //         case 0: QualitySettings.antiAliasing = 0; break;
+    //         case 1: QualitySettings.antiAliasing = 2; break;
+    //         case 3: QualitySettings.antiAliasing = 8; break;
+    //         default: QualitySettings.antiAliasing = 4; break;
+    //     }
+    // }
+    // public void TextureLevel (XRData textureLevel)
+    // {
+    //     QualitySettings.masterTextureLimit = textureLevel.ToInt() % 4;
+    // }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -146,7 +137,7 @@ public class XRUX_SetScene : MonoBehaviour, _XRUX_SetScene
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // When the Scene is loaded, remove any other camera, set up the view and call other onLoad functions
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    void OnSceneLoaded (Scene scene, LoadSceneMode mode)
+    private void OnSceneLoaded (Scene scene, LoadSceneMode mode)
     {
         XRSettings.eyeTextureResolutionScale = (int)visualQuality / 4.0f + 0.5f;
 
@@ -162,6 +153,7 @@ public class XRUX_SetScene : MonoBehaviour, _XRUX_SetScene
                 }               
             }
 
+            // Set the starting position
             SetStartPosition();
         }
     }
@@ -169,23 +161,28 @@ public class XRUX_SetScene : MonoBehaviour, _XRUX_SetScene
 
 
 
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    // Set the ENTRY point
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
     private void SetStartPosition()
     {
-        // Find the entry point if it exists
-        GameObject ENTRY = GameObject.Find("ENTRY");
-        if (ENTRY != null)
-        {
-            this.gameObject.transform.position = ENTRY.transform.position;
-        }
-
-        // Slow any movement right down so we don't go zooming into the next scene
         XRRig_CameraMover xrCameraMoverScript = this.gameObject.GetComponent<XRRig_CameraMover>();
+
         if (xrCameraMoverScript != null)
         {
+            // Find the entry point if it exists
+            GameObject ENTRY = GameObject.Find(xrCameraMoverScript.sceneSettingsObjectName);
+            if (ENTRY != null)
+            {
+                this.gameObject.transform.position = ENTRY.transform.position;
+            }
+
+            // Slow any movement right down so we don't go zooming into the next scene
             xrCameraMoverScript.PutOnBrakes();
             xrCameraMoverScript.StandOnGround();
         }
     }
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 

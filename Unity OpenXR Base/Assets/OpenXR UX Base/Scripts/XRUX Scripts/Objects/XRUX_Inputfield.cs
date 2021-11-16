@@ -17,7 +17,7 @@ using TMPro;
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 // Public functions
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
-public interface _XRUX_Inputfield
+public interface IXRUX_Inputfield
 {
     void Backspace (); // Delete the last character in the string
     void CapsLock (bool newValue); //Turn on or off capslock
@@ -28,6 +28,7 @@ public interface _XRUX_Inputfield
     void Input(float newData); // Add some text
     void Input(int newData); // Add some text
     void Input(bool newData); // Add some text
+    void Input(Vector3 newData); // Add some text
     void Input(XRData newData); // Add some text
     void Input(XRData newEvent, string newData); // Add some text
 
@@ -41,25 +42,12 @@ public interface _XRUX_Inputfield
 // Main class
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 [AddComponentMenu("OpenXR UX/Objects/XRUX InputField")]
-public class XRUX_Inputfield : MonoBehaviour, _XRUX_Inputfield
+public class XRUX_Inputfield : MonoBehaviour, IXRUX_Inputfield
 {
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Public variables
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    // public UnityStringEvent onSendString; 
-    [Header("____________________________________________________________________________________________________")]
-    [Header("A one-line text field such as might be used for user input.\n____________________________________________________________________________________________________")]
-    [Header("INPUTS\n\n - Backspace() - Delete the last character.\n - Capslock() - Toggle Caps Lock\n - Shiftlock() - Toggle Shift Lock\n" +
-            " - Clear() - Clear the display\n - Input( [ int | float | bool | string | XRData ] ) - Input data to display.\n" + 
-            " - Send() - Sends the currently collected text on the onSend Event queue.")]
-
-    [Header("____________________________________________________________________________________________________")]
-    [Header("SETTINGS")]
-    [Header("When checked, chooses the first or second character\nof input based on shift or capslock.")]
     public bool singleCharacters = true;
-
-    [Header("____________________________________________________________________________________________________")]
-    [Header("OUTPUTS")]
     public UnityXRDataEvent onSend; // Functions to call when the send is called (eg when the enter key is pressed)
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -81,6 +69,7 @@ public class XRUX_Inputfield : MonoBehaviour, _XRUX_Inputfield
     public void Input(float theItem) { Input (theItem.ToString()); }
     public void Input(int theItem) { Input (theItem.ToString()); }
     public void Input(bool theItem) { Input (theItem.ToString()); }
+    public void Input(Vector3 theData) { Input(XRData.FromVector3(theData)); }
     public void Input(XRData theData) { Input(theData.ToString()); }
     public void Input(XRData theEvent, string theData) { if (theEvent.ToBool()) Input(theData); }
 

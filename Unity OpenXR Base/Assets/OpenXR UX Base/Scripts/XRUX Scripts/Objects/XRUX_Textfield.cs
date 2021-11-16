@@ -17,7 +17,7 @@ using TMPro;
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 // Public functions
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
-public interface _XRUX_Textfield
+public interface IXRUX_Textfield
 {
     void Clear(); // Clears the text field
 
@@ -25,6 +25,7 @@ public interface _XRUX_Textfield
     void Input(float newTitle); // Add some text
     void Input(int newTitle); // Add some text
     void Input(bool newTitle); // Add some text
+    void Input(Vector3 newTitle); // Add some text
     void Input(XRData newData); // Add some text
 
     void Send(); // Send the current collected text over the output
@@ -37,21 +38,11 @@ public interface _XRUX_Textfield
 // Main class
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 [AddComponentMenu("OpenXR UX/Objects/XRUX Textfield")]
-public class XRUX_Textfield : MonoBehaviour, _XRUX_Textfield
+public class XRUX_Textfield : MonoBehaviour, IXRUX_Textfield
 {
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Public variables
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    [Header("____________________________________________________________________________________________________")]
-    [Header("A one-line text field.\n____________________________________________________________________________________________________")]
-    [Header("INPUTS\n\n - Input( [ int | float | bool | string | XRData ] ) - Input data to display.\n" + 
-            " - Send() - Sends the currently collected text on the onSend Event queue.")]
-
-    [Header("____________________________________________________________________________________________________")]
-    [Header("SETTINGS")]
-
-    [Header("____________________________________________________________________________________________________")]
-    [Header("OUTPUTS")]
     public UnityXRDataEvent onSend; // Functions to call when the send is called
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -71,6 +62,7 @@ public class XRUX_Textfield : MonoBehaviour, _XRUX_Textfield
     public void Input(float theItem) { Input (theItem.ToString()); }
     public void Input(int theItem) { Input (theItem.ToString()); }
     public void Input(bool theItem) { Input (theItem.ToString()); }
+    public void Input(Vector3 theItem) { Input( XRData.FromVector3(theItem)); }
     public void Input(XRData theData) { Input (theData.ToString()); }
 
     public void Input(string theText)

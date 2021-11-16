@@ -40,19 +40,12 @@ public class XRUX_SceneSettings : MonoBehaviour, _XRUX_SceneSettings
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Public variables
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    [Header("____________________________________________________________________________________________________")]
-    [Header("Contains data to be used by CameraMover on SceneLoad about the visual quality settings.\nThese will override the settings on the CameraMover script.\n____________________________________________________________________________________________________")]
-    [Header("SETTINGS")]
-
-    [Header("Dynamic Quality Settings")]
     public bool dynamicQuality = true;
-    [Header("When moving")]
     public SceneSettingsAntiAliasing movingAntiAliasingLevel = SceneSettingsAntiAliasing.None;
     public SceneSettingsTextureQuality movingTextureQuality = SceneSettingsTextureQuality.Eighth;
     public SceneSettingsVisualQuality movingVisualQuality = SceneSettingsVisualQuality.Medium;
     public ShadowQuality movingShadowQuality = ShadowQuality.Disable;
     public ShadowResolution movingShadowResolution = ShadowResolution.Low;
-    [Header("When standing still")]
     public SceneSettingsAntiAliasing standingAntiAliasingLevel = SceneSettingsAntiAliasing.EightTimes;
     public SceneSettingsTextureQuality standingTextureQuality = SceneSettingsTextureQuality.Full;
     public SceneSettingsVisualQuality standingVisualQuality = SceneSettingsVisualQuality.High;

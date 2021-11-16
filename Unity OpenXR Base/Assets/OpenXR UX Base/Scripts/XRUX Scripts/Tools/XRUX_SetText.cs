@@ -17,12 +17,14 @@ using TMPro;
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 // Public functions
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
-public interface _XRUX_SetText
+public interface IXRUX_SetText
 {
+    void Input(Vector3 newTitle); // Change the text
     void Input(string newTitle); // Change the text
     void Input(int newTitle); // Change the text
     void Input(float newTitle); // Change the text
     void Input(bool newTitle); // Change the text
+    void Input(XRData newTitle); // Change the text
 
     string Text();
 }
@@ -34,20 +36,12 @@ public interface _XRUX_SetText
 // Main class
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 [AddComponentMenu("OpenXR UX/Tools/XRUX Set Text")]
-public class XRUX_SetText : MonoBehaviour, _XRUX_SetText
+public class XRUX_SetText : MonoBehaviour, IXRUX_SetText
 {
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Public variables
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    [Header("____________________________________________________________________________________________________")]
-    [Header("Set the TextMeshPro text to the input strings.\n____________________________________________________________________________________________________")]
-    [Header("INPUTS\n\n - Input( [ int | float | bool | string ] ) - Set the text.\n")]
 
-    [Header("____________________________________________________________________________________________________")]
-    [Header("SETTINGS")]
-    [Header("____________________________________________________________________________________________________")]
-    [Header("OUTPUTS")]
-    [Header(" - Text on the GameObject this script is on.")]
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -66,6 +60,8 @@ public class XRUX_SetText : MonoBehaviour, _XRUX_SetText
     public void Input(float theItem) { Input (theItem.ToString()); }
     public void Input(int theItem) { Input (theItem.ToString()); }
     public void Input(bool theItem) { Input (theItem.ToString()); }
+    public void Input(Vector3 theItem) { Input (XRData.FromVector3(theItem)); }
+    public void Input(XRData theItem) { Input (theItem.ToString()); }
     public void Input(string theItem)
     {
         if (textDisplay != null) textDisplay.text = theItem;

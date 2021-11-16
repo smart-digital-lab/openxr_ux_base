@@ -21,7 +21,7 @@ using UnityEngine.Events;
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 // Public functions
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
-public interface _XRUX_ButtonGroup
+public interface IXRUX_ButtonGroup
 {
     void Input(XRData newData);
 }
@@ -33,26 +33,14 @@ public interface _XRUX_ButtonGroup
 // Main class
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 [AddComponentMenu("OpenXR UX/Objects/XRUX Button Group")]
-public class XRUX_ButtonGroup : MonoBehaviour, _XRUX_ButtonGroup
+public class XRUX_ButtonGroup : MonoBehaviour, IXRUX_ButtonGroup
 {
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Public variables
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    [Header("____________________________________________________________________________________________________")]
-    [Header("A Group of Buttons\n\nAdd Buttons as children or create them dynamically below\n____________________________________________________________________________________________________")]
-    [Header("INPUTS\n\n - Input( XRData ) - Integer value to change which button is selected as if it was being pressed.")]
-
-    [Header("____________________________________________________________________________________________________")]
-    [Header("SETTINGS")]
-    [Header("Prefab to be used when creating dynamic Buttons.")]
     public GameObject buttonPrefab;    // Link to the button prefab
-    [Header("Titles of Buttons to be created dynamically.\nThese will appear below the last Button child object.")]
     public string[] dynamicButtons;    // Buttons that are created dynamically with the titles filled in from here.
-    [Header("Vertical spacing between buttons.")]
     public float dynamicButtonSpacing = 0.025f;
-
-    [Header("____________________________________________________________________________________________________")]
-    [Header("OUTPUTS")]
     public UnityXRDataEvent onChange;
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 

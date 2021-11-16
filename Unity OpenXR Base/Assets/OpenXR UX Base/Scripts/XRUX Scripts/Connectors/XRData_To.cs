@@ -16,12 +16,13 @@ using UnityEngine;
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 // Public functions
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
-public interface _XRData_To
+public interface IXRData_To
 {
     void Input(bool newValue);
     void Input(float newValue);
     void Input(int newValue);
     void Input(string newValue);
+    void Input(Vector3 newValue);
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -31,7 +32,7 @@ public interface _XRData_To
 // Main class
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 [AddComponentMenu("OpenXR UX/Connectors/XRData To")]
-public class XRData_To : MonoBehaviour, _XRData_To
+public class XRData_To : MonoBehaviour, IXRData_To
 {
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Public variables
@@ -64,6 +65,10 @@ public class XRData_To : MonoBehaviour, _XRData_To
         if (onChange != null) onChange.Invoke(new XRData(newValue));
     }
     public void Input (string newValue)
+    {
+        if (onChange != null) onChange.Invoke(new XRData(newValue));
+    }
+    public void Input (Vector3 newValue)
     {
         if (onChange != null) onChange.Invoke(new XRData(newValue));
     }

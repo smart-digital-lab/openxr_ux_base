@@ -15,18 +15,17 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
 
-public enum XRGenericButtonAxis { X, Y, Z, None };
-public enum XRGenericButtonMovement { Toggle, Momentary };
-
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 // Public functions
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
-public interface _XRUX_Button
+public interface IXRUX_Button
 {
     void Title(string newTitle);            // Change the text on the button
     void Title(int newTitle);               // Change the text on the button
     void Title(float newTitle);             // Change the text on the button
     void Title(bool newTitle);              // Change the text on the button
+    void Title(Vector3 newTitle);           // Change the text on the button
+    void Title(XRData newTitle);            // Change the text on the button
 
     void Input(XRData newdata);             // Set the state of the button.  If quietly is set to true, doesn't invoke the callbacks.
         
@@ -40,40 +39,27 @@ public interface _XRUX_Button
 // Main class
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 [AddComponentMenu("OpenXR UX/Objects/XRUX Button")]
-public class XRUX_Button : MonoBehaviour, _XRUX_Button
+public class XRUX_Button : MonoBehaviour, IXRUX_Button
 {
+    public enum XRGenericButtonAxis { X, Y, Z, None };
+    public enum XRGenericButtonMovement { Toggle, Momentary };
+
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Public variables
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    [Header("____________________________________________________________________________________________________")]
-    [Header("A movable button.\n____________________________________________________________________________________________________")]
-    [Header("INPUTS\n\n - Title( [ int | float | bool | string ] ) - Set the button title.\n - Input( XRData ) - Boolean value to change the button state as if it was being pressed.")]
-
-    [Header("____________________________________________________________________________________________________")]
-    [Header("SETTINGS")]
-    [Header("The object that will change colour when pressed.")]
     public Renderer objectToColor;          // The object that needs to change colour when activated
-    [Header("The object that will move when pressed.")]
     public GameObject objectToMove;         // The GameObject that will move when activated
-
-    [Header("Materials for the different interactions states.")]
     public Material normalMaterial;         // The material for when not pressed
     public Material activatedMaterial;      // The material for when pressed
     public Material touchedMaterial;        // The material for when touched
-
-    [Header("Movement Axis (or none), and amount")]
     public XRGenericButtonAxis movementAxis = XRGenericButtonAxis.Z;
     public float movementAmount = 0.004f;
-
-    [Header("Button movement style")]
     public XRGenericButtonMovement movementStyle = XRGenericButtonMovement.Toggle;
-
-    [Header("____________________________________________________________________________________________________")]
-    [Header("OUTPUTS")]
     public UnityXRDataEvent onChange;       // Changes on click or unclick, with boolean
     public UnityEvent onClick;              // Functions to call when click-down
     public UnityEvent onUnclick;            // Functions to call when click-up
-    public UnityXRDataEvent onTouch;        // Functions to call when first touched
+    public UnityEvent onTouch;          // Functions to call when first touched
+    public UnityEvent onUntouch;            // Functions to call when first touched
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -97,6 +83,8 @@ public class XRUX_Button : MonoBehaviour, _XRUX_Button
     public void Title(float newTitle) { Title(newTitle.ToString()); }
     public void Title(int newTitle) { Title(newTitle.ToString()); }
     public void Title(bool newTitle) { Title(newTitle.ToString()); }
+    public void Title(Vector3 newTitle) { Title(XRData.FromVector3(newTitle)); }
+    public void Title(XRData newTitle) { Title(newTitle.ToString()); }
     public void Title(string newTitle)
     {
         XRUX_SetText textToChange = GetComponentInChildren<XRUX_SetText>();
@@ -206,7 +194,7 @@ public class XRUX_Button : MonoBehaviour, _XRUX_Button
         if (other.gameObject.tag == "XRLeft") isLeft = true;
         if (other.gameObject.tag == "XRRight") isRight = true;
         if (objectToColor != null) objectToColor.material = touchedMaterial;
-        if (onTouch != null) onTouch.Invoke(new XRData(true));
+        if (onTouch != null) onTouch.Invoke();
     }
     void OnTriggerStay(Collider other)
     {
@@ -238,7 +226,7 @@ public class XRUX_Button : MonoBehaviour, _XRUX_Button
             }
         }
         isLeft = isRight = false;
-        if (onTouch != null) onTouch.Invoke(new XRData(false));
+        if (onUntouch != null) onUntouch.Invoke();
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 

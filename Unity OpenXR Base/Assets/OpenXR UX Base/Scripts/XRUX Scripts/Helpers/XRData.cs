@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.XR;
+using JSONEncoderDecoder;
 
 public enum OpenXR_UX_Layers { OpenXR_UX = 6, Go_Areas, NoGo_Areas, Player, Other_Players }
 public enum OpenXR_UX_Tags { XREvents, XRLeft, XRRight, XRMuxEvents }
@@ -24,13 +25,14 @@ public enum OpenXR_UX_Tags { XREvents, XRLeft, XRRight, XRMuxEvents }
 [Serializable]
 public class XRData
 {
-    public enum XRDataType { INT, FLOAT, BOOL, STRING }
+    public enum XRDataType { INT, FLOAT, BOOL, STRING, VECTOR3 }
 
     private XRDataType theType;
     private int intValue = 0;
     private float floatValue = 0.0f;
     private bool boolValue = false;
     private string stringValue = "";
+    private Vector3 vector3Value = new Vector3();
     private bool quietlyValue = false;
 
     public bool quietly { get { return quietlyValue; }  set { quietlyValue = value; } }
@@ -40,6 +42,7 @@ public class XRData
     public float ToFloat() { return floatValue; }
     public bool ToBool() { return boolValue; }
     public override string ToString() {return stringValue; }
+    public Vector3 ToVector3() {return vector3Value; }
 
     public XRData(float newValue, bool newQuietly = false)
     {
@@ -47,6 +50,7 @@ public class XRData
         floatValue = newValue;
         boolValue = Convert.ToBoolean(newValue);
         stringValue = newValue.ToString();
+        vector3Value.x = newValue;
         quietly = newQuietly;
         theType = XRDataType.FLOAT;
     }
@@ -56,6 +60,7 @@ public class XRData
         floatValue = Convert.ToSingle(newValue);
         boolValue = Convert.ToBoolean(newValue);
         stringValue = newValue.ToString();
+        vector3Value.x = Convert.ToSingle(newValue);
         quietly = newQuietly;
         theType = XRDataType.INT;
     }
@@ -65,6 +70,7 @@ public class XRData
         floatValue = Convert.ToSingle(newValue);
         boolValue = newValue;
         stringValue = newValue.ToString();
+        vector3Value.x = Convert.ToSingle(newValue);
         quietly = newQuietly;
         theType = XRDataType.BOOL;
     }
@@ -74,10 +80,41 @@ public class XRData
         float.TryParse(newValue, out floatValue);
         bool.TryParse(newValue, out boolValue);
         stringValue = newValue;
+        vector3Value = ToVector3(newValue);
         quietly = newQuietly;
         theType = XRDataType.STRING;
     }
+
+    public XRData(Vector3 newValue, bool newQuietly = false)
+    {
+        intValue = Mathf.RoundToInt(newValue.x);
+        floatValue = newValue.x;
+        boolValue = Convert.ToBoolean(newValue.x);
+        stringValue = FromVector3(newValue);
+        vector3Value = newValue;
+        quietly = newQuietly;
+        theType = XRDataType.FLOAT;
+    }
+
+    public static Vector3 ToVector3(string data)
+    {
+        ArrayList arrayData = (ArrayList) JSON.JsonDecode(data);
+        return ToVector3(arrayData);
+    }
+    public static Vector3 ToVector3(ArrayList data)
+    {
+        float x, y, z = 0.0f;
+        float.TryParse(data[0].ToString(), out x);
+        float.TryParse(data[1].ToString(), out y);
+        float.TryParse(data[2].ToString(), out z);
+        return new Vector3(x,y,z);
+    }
+    public static string FromVector3(Vector3 data)
+    {
+        return ("[" + data.x + "," + data.y + "," + data.z + "]");
+    }
 }
+
 
 [Serializable]
 public class UnityXRDataEvent : UnityEvent<XRData> {}
@@ -89,4 +126,6 @@ public class UnityBooleanEvent : UnityEvent<bool> {}
 public class UnityFloatEvent : UnityEvent<float> {}
 [Serializable]
 public class UnityStringEvent : UnityEvent<string> {}
+[Serializable]
+public class UnityVector3Event : UnityEvent<Vector3> {}
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -17,7 +17,7 @@ using UnityEngine;
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 // Public functions
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
-public interface _XRUX_ActivateByProximity
+public interface IXRUX_ActivateByProximity
 {
     void Input(XRData newData);
 }
@@ -29,22 +29,12 @@ public interface _XRUX_ActivateByProximity
 // Main class
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 [AddComponentMenu("OpenXR UX/Tools/XRUX Activate By Proximity")]
-public class XRUX_ActivateByProximity : MonoBehaviour, _XRUX_ActivateByProximity
+public class XRUX_ActivateByProximity : MonoBehaviour, IXRUX_ActivateByProximity
 {
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Public variables
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    [Header("____________________________________________________________________________________________________")]
-    [Header("Send an event when nearby.\n____________________________________________________________________________________________________")]
-    [Header("INPUTS\n\n - Input() - Set up the XRData to send when nearby.")]
-
-    [Header("____________________________________________________________________________________________________")]
-    [Header("SETTINGS")]
-    [Header("Distance to activate at.")]
     public float distance = 2.0f;                       // Proximity to activate at
-
-    [Header("OUTPUTS")]
-    [Header("Event and Action to send when activated")]
     public XRDeviceEventTypes activateTrigger;          // Event to send when activating
     public XRDeviceActions activateAction;              // Action to send when activating
     // ------------------------------------------------------------------------------------------------------------------------------------------------------

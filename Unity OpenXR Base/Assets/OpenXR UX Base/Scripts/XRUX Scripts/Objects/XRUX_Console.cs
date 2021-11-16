@@ -17,15 +17,16 @@ using TMPro;
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 // Public functions
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
-public interface _XRUX_Console
+public interface IXRUX_Console
 {
     void Clear(); // Clear the console
 
-    void Input(string newTitle); // Add line to the console
-    void Input(int newTitle); // Add line to the console
-    void Input(float newTitle); // Add line to the console
-    void Input(bool newTitle); // Add line to the console
-    void Input(XRData newData); // Add line to the console
+    void Input(Vector3 theItem); // Add line to the console
+    void Input(string theItem); // Add line to the console
+    void Input(int theItem); // Add line to the console
+    void Input(float theItem); // Add line to the console
+    void Input(bool theItem); // Add line to the console
+    void Input(XRData theItem); // Add line to the console
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -35,20 +36,12 @@ public interface _XRUX_Console
 // Main class
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 [AddComponentMenu("OpenXR UX/Objects/XRUX Console")]
-public class XRUX_Console : MonoBehaviour, _XRUX_Console
+public class XRUX_Console : MonoBehaviour, IXRUX_Console
 {
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Public variables
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    [Header("____________________________________________________________________________________________________")]
-    [Header("A console-like text field that holds a number of lines of text.\n____________________________________________________________________________________________________")]
-    [Header("INPUTS\n\n - Clear() - Clear the console.\n - Input( [ int | float | bool | string | XRData ] ) - Add a line of text.")]
-    [Header("____________________________________________________________________________________________________")]
-    [Header("SETTINGS")]
-    [Header("Number of lines in the console.")]
     public int numLines = 20;
-
-    [Header("Accept and show global console events.")]
     public bool acceptGlobal = true;
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -66,6 +59,7 @@ public class XRUX_Console : MonoBehaviour, _XRUX_Console
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Overloaded Print functions for various types
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    public void Input(Vector3 theItem) { Input (XRData.FromVector3(theItem)); }
     public void Input(float theItem) { Input (theItem.ToString()); }
     public void Input(int theItem) { Input (theItem.ToString()); }
     public void Input(bool theItem) { Input (theItem.ToString()); }

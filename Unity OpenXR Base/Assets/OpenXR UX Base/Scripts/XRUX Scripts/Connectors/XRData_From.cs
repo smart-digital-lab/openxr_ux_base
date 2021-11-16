@@ -16,7 +16,7 @@ using UnityEngine;
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 // Public functions
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
-public interface _XRData_From
+public interface IXRData_From
 {
     void Input(XRData newValue);
 }
@@ -28,24 +28,16 @@ public interface _XRData_From
 // Main class
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 [AddComponentMenu("OpenXR UX/Connectors/XRData From")]
-public class XRData_From : MonoBehaviour, _XRData_From
+public class XRData_From : MonoBehaviour, IXRData_From
 {
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Public variables
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    [Header("____________________________________________________________________________________________________")]
-    [Header("Convert XRData into boolean, float, integer or String.\n____________________________________________________________________________________________________")]
-    [Header("INPUTS\n\n - Input() - XRData value coming in.")]
-
-    [Header("____________________________________________________________________________________________________")]
-    [Header("SETTINGS")]
-
-    [Header("____________________________________________________________________________________________________")]
-    [Header("OUTPUTS")]
     public UnityBooleanEvent onChangeBoolean;
     public UnityFloatEvent onChangeFloat;
     public UnityIntegerEvent onChangeInteger;
     public UnityStringEvent onChangeString;
+    public UnityVector3Event onChangeVector3;
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -66,6 +58,7 @@ public class XRData_From : MonoBehaviour, _XRData_From
         if (onChangeBoolean != null) onChangeBoolean.Invoke(newValue.ToBool());
         if (onChangeFloat != null) onChangeFloat.Invoke(newValue.ToFloat());
         if (onChangeString != null) onChangeString.Invoke(newValue.ToString());
+        if (onChangeVector3 != null) onChangeVector3.Invoke(newValue.ToVector3());
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 }

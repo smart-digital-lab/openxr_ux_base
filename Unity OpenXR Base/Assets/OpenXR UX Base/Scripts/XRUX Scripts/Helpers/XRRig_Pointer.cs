@@ -17,7 +17,7 @@ using UnityEngine;
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 // Public functions
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
-public interface _XRRig_Pointer
+public interface IXRRig_Pointer
 {
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -27,20 +27,12 @@ public interface _XRRig_Pointer
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 // Main class
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
-public class XRRig_Pointer : MonoBehaviour, _XRRig_Pointer
+public class XRRig_Pointer : MonoBehaviour, IXRRig_Pointer
 {
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Public variables
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    [Header("____________________________________________________________________________________________________")]
-    [Header("Detects when the user is pointing at clickable objects and places to move.\nShould go on the pointer object attached to the left and right Controllers.\n____________________________________________________________________________________________________")]
-    [Header("INPUTS\n\n - Movements from the XR Controllers")]
-
-    [Header("____________________________________________________________________________________________________")]
-    [Header("SETTINGS")]
-    [Header("A GameObject in the SceneGraph to move to where the user is pointing.")]
     public GameObject Marker;
-    [Header("Material for the line that connects the hand controller to the movement or pointer marker.")]
     public Material trailMaterial;
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -87,7 +79,7 @@ public class XRRig_Pointer : MonoBehaviour, _XRRig_Pointer
 
 
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    // Raycast from the pointer and move the marker if it hits objects on layer 6 (clickable objects) or layer 7 (objects to be able to move onto)
+    // Raycast from the pointer and move the marker if it hits objects on 'interaction' layers (clickable objects) or 'go' layers (objects to be able to move onto)
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     void Update()
     {

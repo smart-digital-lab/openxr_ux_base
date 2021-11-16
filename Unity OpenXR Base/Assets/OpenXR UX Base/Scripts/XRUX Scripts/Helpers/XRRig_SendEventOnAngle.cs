@@ -16,7 +16,7 @@ using UnityEngine;
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 // Public functions
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
-public interface _XRRig_SendEventOnAngle
+public interface IXRRig_SendEventOnAngle
 {
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -26,32 +26,18 @@ public interface _XRRig_SendEventOnAngle
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 // Main class
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
-public class XRRig_SendEventOnAngle : MonoBehaviour, _XRRig_SendEventOnAngle
+public class XRRig_SendEventOnAngle : MonoBehaviour, IXRRig_SendEventOnAngle
 {
     public enum Direction { FORWARD, BACK }
 
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Public variables
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    [Header("____________________________________________________________________________________________________")]
-    [Header("Send a chosen event and action, and boolean value, when the two transformations have\nless than a certain angle between them.\nSends true when going inside the angle and false when going outside of the angle.\n____________________________________________________________________________________________________")]
-    [Header("INPUTS")]
-    [Header("Source Transformation")]
     public Transform source; // Source object to look from
-    [Header("Target Transformation")]
     public Transform target; // Target object to look towards
-
-    [Header("____________________________________________________________________________________________________")]
-    [Header("SETTINGS")]
-    [Header("Angle at which to trigger (in and out)")]
     public float triggerAngle = 20.0f; // The angle at which to trigger the event
-    [Header("Looking forwards or backwards")]
     public Direction zDirection = Direction.FORWARD; // Are we looking along the Z axis or back along the Z axis?
-    [Header("____________________________________________________________________________________________________")]
-    [Header("OUTPUTS")]
-    [Header("Event to send")]
     public XRDeviceEventTypes eventToSendOnTrigger; // The event to trigger
-    [Header("Action to send")]
     public XRDeviceActions actionToSendOnTrigger; // The action to trigger
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 

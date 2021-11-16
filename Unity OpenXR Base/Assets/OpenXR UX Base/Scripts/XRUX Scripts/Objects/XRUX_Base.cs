@@ -17,7 +17,7 @@ using UnityEngine;
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 // Public functions
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
-public interface _XRUX_Base
+public interface IXRUX_Base
 {
     void Maximise();
     void Minimise();
@@ -30,17 +30,11 @@ public interface _XRUX_Base
 // Main class
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 [AddComponentMenu("OpenXR UX/Objects/XRUX Base")]
-public class XRUX_Base : MonoBehaviour, _XRUX_Base
+public class XRUX_Base : MonoBehaviour, IXRUX_Base
 {
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Public variables
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    [Header("____________________________________________________________________________________________________")]
-    [Header("A useful flat surface to put XR Objects on that can be minimised and maximised.\n____________________________________________________________________________________________________")]
-    [Header("INPUTS\n\n - Maximise()\n - Minimise()")]
-
-    [Header("____________________________________________________________________________________________________")]
-    [Header("SETTINGS")]
     public GameObject Maximised; // GameObject to be maximised
     public GameObject Minimised; // GameObject to be minimised
     public bool startMinimised = false; // Whether to start minimised or maximised.
