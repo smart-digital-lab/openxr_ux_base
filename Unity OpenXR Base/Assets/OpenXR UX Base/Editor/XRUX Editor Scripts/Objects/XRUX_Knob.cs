@@ -52,6 +52,6 @@ public class XRUX_Knob_Editor : Editor
         var prop3 = serializedObject.FindProperty("onUntouch"); EditorGUILayout.PropertyField(prop3, true);    
         EditorGUILayout.Space();
         serializedObject.ApplyModifiedProperties();
-    }
+        EditorUtility.SetDirty(target);    }
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------

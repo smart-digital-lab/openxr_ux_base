@@ -31,6 +31,8 @@ public class XRUX_SetText_Editor : Editor
         XRUX_Editor_Settings.DrawOutputsHeading();
         EditorGUILayout.LabelField("Text on the GameObject", "string", XRUX_Editor_Settings.fieldStyle);
         EditorGUILayout.Space();
+        serializedObject.ApplyModifiedProperties();
+        EditorUtility.SetDirty(target);
     }
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------

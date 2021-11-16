@@ -35,6 +35,8 @@ public class XRUX_ActivateByProximity_Editor : Editor
         myTarget.activateTrigger = (XRDeviceEventTypes) EditorGUILayout.EnumPopup("Event trigger to send", myTarget.activateTrigger);
         myTarget.activateAction = (XRDeviceActions) EditorGUILayout.EnumPopup("Event action to send", myTarget.activateAction);
         EditorGUILayout.Space();
+        serializedObject.ApplyModifiedProperties();
+        EditorUtility.SetDirty(target);
     }
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------

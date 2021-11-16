@@ -31,6 +31,8 @@ public class XRUX_ToConsole_Editor : Editor
         XRUX_Editor_Settings.DrawOutputsHeading();
         EditorGUILayout.LabelField("Event on event Queue", "XREvent", XRUX_Editor_Settings.fieldStyle);
         EditorGUILayout.Space();
+        serializedObject.ApplyModifiedProperties();
+        EditorUtility.SetDirty(target);
     }
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------

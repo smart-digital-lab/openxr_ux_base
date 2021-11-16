@@ -34,6 +34,8 @@ public class XRUX_Rotate_Editor : Editor
         XRUX_Editor_Settings.DrawOutputsHeading();
         EditorGUILayout.LabelField("Y-Axis Rotation", "float", XRUX_Editor_Settings.fieldStyle);
         EditorGUILayout.Space();
+        serializedObject.ApplyModifiedProperties();
+        EditorUtility.SetDirty(target);
     }
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -38,6 +38,7 @@ public class XRUX_Base_Editor : Editor
         EditorGUILayout.LabelField("Actions", "Activate or inactivate GameObjects in the hierarchy.", XRUX_Editor_Settings.fieldStyle);
         EditorGUILayout.Space();
         serializedObject.ApplyModifiedProperties();
+        EditorUtility.SetDirty(target);
     }
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------

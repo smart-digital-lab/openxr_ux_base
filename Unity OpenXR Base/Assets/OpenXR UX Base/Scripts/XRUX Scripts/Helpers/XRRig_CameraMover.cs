@@ -39,6 +39,8 @@ public class XRRig_CameraMover : MonoBehaviour, IXRRig_CameraMover
     public enum MovementDevice  { Head, Controller }
     public enum XRType { Immersive_XR, Desktop_XR }
 
+    public enum RotationStyle { Stepped, Smooth }
+
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Public variables
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -54,6 +56,8 @@ public class XRRig_CameraMover : MonoBehaviour, IXRRig_CameraMover
     public float accelerationFactor = 1.0f;
     public float maximumVelocity = 0.05f;
     public float maximumFlyingHeight = 20.0f;
+    public RotationStyle rotationStyle = RotationStyle.Stepped;
+    public float steppingAngle = 30;
     public float rotationFrictionFactor = 0.5f;
     public float rotationAccelerationFactor = 2.0f;
     public string sceneSettingsObjectName = "ENTRY";
@@ -84,6 +88,7 @@ public class XRRig_CameraMover : MonoBehaviour, IXRRig_CameraMover
     private Vector3 acceleration;
     private float angularVelocity;
     private float angularAcceleration;
+    private float angularStepTime;
     private float hitFrictionFactor = 0.0f; // Between 0.0f and 0.5f
     private bool movingToTarget = false;
     private bool fadingInAndOut = false;
@@ -393,8 +398,8 @@ public class XRRig_CameraMover : MonoBehaviour, IXRRig_CameraMover
                 float groundHeight = 0.0f;
                 bool hittingGround = heightAbove(newPosition, out groundHeight);
 
-                // Alow a second to start flying, or if getting really close to a 'ground' object
-                if ((Time.time - startFlyingTime) > 1.0f)
+                // Alow half a second to start flying, or if getting really close to a 'ground' object
+                if ((Time.time - startFlyingTime) > 0.5f)
                 {
                     // If after that time, we are still on the ground, then stay on the ground
                     if (hittingGround)
@@ -470,7 +475,31 @@ public class XRRig_CameraMover : MonoBehaviour, IXRRig_CameraMover
 
         // Work out rotation
         angularVelocity = angularVelocity + (angularAcceleration * Time.deltaTime * rotationAccelerationFactor) + (angularVelocity * Time.deltaTime * -rotationFrictionFactor);
-        transform.Rotate(0.0f, angularVelocity, 0.0f);
+        if (rotationStyle == RotationStyle.Stepped)
+        {
+            if ((Time.time - angularStepTime) > 0.5f)
+            {
+                if (angularAcceleration > 0.001)
+                {
+                    transform.eulerAngles = transform.eulerAngles + new Vector3(0, steppingAngle, 0);
+                    angularStepTime = Time.time;
+                }
+                else if (angularAcceleration < -0.001)
+                {
+                    transform.eulerAngles = transform.eulerAngles + new Vector3(0, -steppingAngle, 0);
+                    angularStepTime = Time.time;
+                }
+                else
+                {
+                    // Make is so that the next rotation happens immediately the button is pressed.
+                    angularStepTime = Time.time - 0.5f;
+                }
+            }
+        }
+        else
+        {
+            transform.Rotate(0.0f, angularVelocity, 0.0f);
+        }
 
         // Set head movements and track a marker with the mouse in Desktop mode
         if (XRMode == XRType.Desktop_XR)

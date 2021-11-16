@@ -43,6 +43,6 @@ public class XRUX_InputField_Editor : Editor
         EditorGUILayout.Space();
 
         serializedObject.ApplyModifiedProperties();
-    }
+        EditorUtility.SetDirty(target);    }
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------

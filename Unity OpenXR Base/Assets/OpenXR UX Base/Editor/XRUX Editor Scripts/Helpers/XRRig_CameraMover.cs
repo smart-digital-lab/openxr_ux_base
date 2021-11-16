@@ -28,8 +28,8 @@ public class XRRig_CameraMover_Editor : Editor
         XRUX_Editor_Settings.DrawInputsHeading();
         EditorGUILayout.LabelField("Inputs from the XR Controllers", XRUX_Editor_Settings.fieldStyle);
         EditorGUILayout.LabelField("PutOnBrakes", XRUX_Editor_Settings.fieldStyle);
-        EditorGUILayout.LabelField("SetMovementStyle", "XRData", XRUX_Editor_Settings.fieldStyle);
         EditorGUILayout.LabelField("StandOnGround", XRUX_Editor_Settings.fieldStyle);
+        EditorGUILayout.LabelField("SetMovementStyle", "XRData", XRUX_Editor_Settings.fieldStyle);
 
         XRUX_Editor_Settings.DrawParametersHeading();
         EditorGUILayout.LabelField("Connections into the XRRig", XRUX_Editor_Settings.categoryStyle);
@@ -44,9 +44,12 @@ public class XRRig_CameraMover_Editor : Editor
         EditorGUILayout.Space();
         EditorGUILayout.LabelField("Teleportation", XRUX_Editor_Settings.categoryStyle);
         myTarget.movementStyle = (XRRig_CameraMover.MovementStyle) EditorGUILayout.EnumPopup("Movement Style", myTarget.movementStyle);
-        myTarget.teleportFader = (GameObject) EditorGUILayout.ObjectField("The Player object", myTarget.teleportFader, typeof(GameObject), true);
-        myTarget.teleportFadeTime = EditorGUILayout.FloatField("Fade in and out time (s)", myTarget.teleportFadeTime);
-
+        if (myTarget.movementStyle == XRRig_CameraMover.MovementStyle.teleportToMarker)
+        {
+            myTarget.teleportFader = (GameObject) EditorGUILayout.ObjectField("The Player object", myTarget.teleportFader, typeof(GameObject), true);
+            myTarget.teleportFadeTime = EditorGUILayout.FloatField("Fade in and out time (s)", myTarget.teleportFadeTime);
+        }
+ 
         EditorGUILayout.Space();
         EditorGUILayout.LabelField("Movement Control", XRUX_Editor_Settings.categoryStyle);
         myTarget.movementPointer = (XRRig_CameraMover.MovementDevice) EditorGUILayout.EnumPopup("Device to point for direction", myTarget.movementPointer);
@@ -62,9 +65,17 @@ public class XRRig_CameraMover_Editor : Editor
 
         EditorGUILayout.Space();
         EditorGUILayout.LabelField("Rotation Parameters", XRUX_Editor_Settings.categoryStyle);
-        EditorGUILayout.LabelField("Acceleration is applied as long as the controller button is held, then friction slows down the rotation.", XRUX_Editor_Settings.helpTextStyle);
-        myTarget.rotationAccelerationFactor = EditorGUILayout.FloatField("Acceleration", myTarget.rotationAccelerationFactor);
-        myTarget.rotationFrictionFactor = EditorGUILayout.FloatField("Friction", myTarget.maximumFlyingHeight);
+        myTarget.rotationStyle = (XRRig_CameraMover.RotationStyle) EditorGUILayout.EnumPopup("Rotation style", myTarget.rotationStyle);
+        if (myTarget.rotationStyle == XRRig_CameraMover.RotationStyle.Stepped) 
+        { 
+            myTarget.steppingAngle = EditorGUILayout.FloatField("Stepping angle (degrees)", myTarget.steppingAngle); 
+        }
+        else
+        {
+            EditorGUILayout.LabelField("Angular acceleration is applied as long as the controller button is held, then friction slows down the rotation.", XRUX_Editor_Settings.helpTextStyle);
+            myTarget.rotationAccelerationFactor = EditorGUILayout.FloatField("Acceleration", myTarget.rotationAccelerationFactor);
+            myTarget.rotationFrictionFactor = EditorGUILayout.FloatField("Friction", myTarget.maximumFlyingHeight);
+        }
 
         EditorGUILayout.Space();
         EditorGUILayout.LabelField("Dynamic Quality Settings", XRUX_Editor_Settings.categoryStyle);
@@ -96,6 +107,8 @@ public class XRRig_CameraMover_Editor : Editor
         XRUX_Editor_Settings.DrawOutputsHeading();
         EditorGUILayout.LabelField("Movement of the camera", XRUX_Editor_Settings.fieldStyle);
         EditorGUILayout.Space();
+        serializedObject.ApplyModifiedProperties();
+        EditorUtility.SetDirty(target);
     }
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------

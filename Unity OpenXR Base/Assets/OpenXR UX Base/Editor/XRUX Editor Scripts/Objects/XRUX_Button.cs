@@ -43,6 +43,7 @@ public class XRUX_Button_Editor : Editor
         myTarget.touchedMaterial = (Material) EditorGUILayout.ObjectField("Touched Material", myTarget.touchedMaterial, typeof(Material), true);
         EditorGUILayout.Space();
         EditorGUILayout.LabelField("Movement axis (or none), and distance", XRUX_Editor_Settings.categoryStyle);
+        Debug.Log(myTarget.movementAxis);
         myTarget.movementAxis = (XRUX_Button.XRGenericButtonAxis) EditorGUILayout.EnumPopup("Movement Axis", myTarget.movementAxis);
         myTarget.movementAmount = EditorGUILayout.FloatField("Movement Amount", myTarget.movementAmount);
         EditorGUILayout.Space();
@@ -58,6 +59,7 @@ public class XRUX_Button_Editor : Editor
         var prop5 = serializedObject.FindProperty("onUntouch"); EditorGUILayout.PropertyField(prop5, true);   
         EditorGUILayout.Space();
         serializedObject.ApplyModifiedProperties();
+        EditorUtility.SetDirty(target);
     }
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------

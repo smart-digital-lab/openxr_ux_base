@@ -37,6 +37,7 @@ public class XRData_SendEvery_Editor : Editor
         EditorGUILayout.Space();
 
         serializedObject.ApplyModifiedProperties();
+        EditorUtility.SetDirty(target);
     }
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------

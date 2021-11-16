@@ -34,6 +34,7 @@ public class XRRig_RotateToCamera_Editor : Editor
         EditorGUILayout.LabelField("Rotation of this GameObject on the y axis", XRUX_Editor_Settings.fieldStyle);
         EditorGUILayout.Space();
         serializedObject.ApplyModifiedProperties();
+        EditorUtility.SetDirty(target);
     }
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------

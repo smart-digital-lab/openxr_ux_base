@@ -52,7 +52,8 @@ public class XRUX_SceneSettings_Editor : Editor
         XRUX_Editor_Settings.DrawOutputsHeading();
         EditorGUILayout.Space();
         
-        serializedObject.ApplyModifiedProperties ();
+        serializedObject.ApplyModifiedProperties();
+        EditorUtility.SetDirty(target);
     }
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------

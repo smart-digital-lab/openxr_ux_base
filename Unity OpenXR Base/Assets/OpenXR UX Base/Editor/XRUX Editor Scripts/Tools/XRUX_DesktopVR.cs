@@ -33,6 +33,8 @@ public class XRUX_DesktopVR_Editor : Editor
         XRUX_Editor_Settings.DrawOutputsHeading();
         EditorGUILayout.LabelField("Activate", "bool", XRUX_Editor_Settings.fieldStyle);
         EditorGUILayout.Space();
+        serializedObject.ApplyModifiedProperties();
+        EditorUtility.SetDirty(target);
     }
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------

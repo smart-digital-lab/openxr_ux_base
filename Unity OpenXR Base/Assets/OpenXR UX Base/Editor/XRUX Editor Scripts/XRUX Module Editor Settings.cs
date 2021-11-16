@@ -23,7 +23,7 @@ public static class XRUX_Editor_Settings
         get {
             GUIStyle headingStyle = new GUIStyle();
             headingStyle.fontStyle = FontStyle.Normal;
-            headingStyle.fontSize = 16;
+            headingStyle.fontSize = 18;
             headingStyle.alignment = TextAnchor.MiddleCenter;
             headingStyle.normal.textColor = Color.white;
             headingStyle.wordWrap = true;
@@ -38,7 +38,7 @@ public static class XRUX_Editor_Settings
         get {
             GUIStyle descriptionStyle = new GUIStyle();
             descriptionStyle.fontStyle = FontStyle.Italic;
-            descriptionStyle.fontSize = 12;
+            descriptionStyle.fontSize = 13;
             descriptionStyle.alignment = TextAnchor.MiddleCenter;
             descriptionStyle.normal.textColor = Color.grey;
             descriptionStyle.wordWrap = true;
@@ -53,7 +53,7 @@ public static class XRUX_Editor_Settings
             subHeadingStyle.fontStyle = FontStyle.Normal;
             subHeadingStyle.fontSize = 13;
             subHeadingStyle.alignment = TextAnchor.MiddleLeft;
-            subHeadingStyle.normal.textColor = new Color(150, 150, 150);
+            subHeadingStyle.normal.textColor = new Color(0.8f, 0.8f, 0.8f);
 
             return subHeadingStyle;
         }
@@ -66,7 +66,7 @@ public static class XRUX_Editor_Settings
             fieldstyle.fontStyle = FontStyle.Normal;
             fieldstyle.fontSize = 12;
             fieldstyle.alignment = TextAnchor.MiddleLeft;
-            fieldstyle.normal.textColor = Color.grey;
+            fieldstyle.normal.textColor = new Color(0.8f, 0.8f, 0.8f);
 
             return fieldstyle;
         }
@@ -78,7 +78,7 @@ public static class XRUX_Editor_Settings
         get {
             GUIStyle categoryStyle = new GUIStyle();
             categoryStyle.fontStyle = FontStyle.Italic;
-            categoryStyle.fontSize = 13;
+            categoryStyle.fontSize = 14;
             categoryStyle.alignment = TextAnchor.MiddleLeft;
             categoryStyle.normal.textColor = Color.grey;
 

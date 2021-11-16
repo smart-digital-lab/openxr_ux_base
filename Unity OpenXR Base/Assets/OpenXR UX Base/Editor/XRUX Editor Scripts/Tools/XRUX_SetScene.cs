@@ -41,6 +41,8 @@ public class XRUX_SetScene_Editor : Editor
         XRUX_Editor_Settings.DrawOutputsHeading();
         var prop2 = serializedObject.FindProperty("onChange"); EditorGUILayout.PropertyField(prop2, true);    
         EditorGUILayout.Space();
+        serializedObject.ApplyModifiedProperties();
+        EditorUtility.SetDirty(target);
     }
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------

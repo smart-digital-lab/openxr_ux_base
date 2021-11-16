@@ -36,6 +36,6 @@ public class XRUX_Textfield_Editor : Editor
         EditorGUILayout.Space();
 
         serializedObject.ApplyModifiedProperties();
-    }
+        EditorUtility.SetDirty(target);    }
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
