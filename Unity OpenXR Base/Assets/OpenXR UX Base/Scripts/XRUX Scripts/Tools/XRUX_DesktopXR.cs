@@ -1,38 +1,43 @@
 /**********************************************************************************************************************************************************
- * XRUX_ToConsole
+ * XRUX_DesktopXR
  * --------------
  *
  * 2021-11-15
  *
- * Editor Layer Settings for XRUX_ToConsole
+ * Activate or inactivate an object depending on whether running in Desktop or Immersive VR.
  *
  * Roy Davies, Smart Digital Lab, University of Auckland.
  **********************************************************************************************************************************************************/
- 
-using UnityEngine;
 using System.Collections;
-using UnityEditor;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.XR;
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
-// XRUX_ToConsole
+// Main class
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
-[CustomEditor(typeof(XRUX_ToConsole))]
-public class XRUX_ToConsole_Editor : Editor 
+[AddComponentMenu("OpenXR UX/Tools/XRUX Desktop XR")]
+public class XRUX_DesktopXR : MonoBehaviour
 {
-    public override void OnInspectorGUI()
+    public enum XRType { Immersive_XR, Desktop_XR }
+    public XRType activateForTypeOfXR = XRType.Immersive_XR;
+
+    void Start()
     {
-        XRUX_Editor_Settings.DrawMainHeading("Send XRData to console", "Send inputted data to the Console via the event queue.");
-
-        XRUX_Editor_Settings.DrawInputsHeading();
-        EditorGUILayout.LabelField("Input", "XRData", XRUX_Editor_Settings.fieldStyle);
-
-        XRUX_Editor_Settings.DrawParametersHeading();
-
-        XRUX_Editor_Settings.DrawOutputsHeading();
-        EditorGUILayout.LabelField("Event on event Queue", "XREvent", XRUX_Editor_Settings.fieldStyle);
-        EditorGUILayout.Space();
-        serializedObject.ApplyModifiedProperties();
-        if (GUI.changed) EditorUtility.SetDirty(target);
+        if (activateForTypeOfXR == XRType.Immersive_XR)
+        {
+            if (XRSettings.isDeviceActive) 
+                this.gameObject.SetActive(true);
+            else
+                this.gameObject.SetActive(false);
+        }
+        else
+        {
+            if (!XRSettings.isDeviceActive)
+                this.gameObject.SetActive(true);
+            else
+                this.gameObject.SetActive(false);
+        }
     }
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------

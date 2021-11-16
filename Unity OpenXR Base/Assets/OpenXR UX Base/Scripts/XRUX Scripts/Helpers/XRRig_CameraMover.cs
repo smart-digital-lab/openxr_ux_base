@@ -44,6 +44,7 @@ public class XRRig_CameraMover : MonoBehaviour, IXRRig_CameraMover
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Public variables
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    public XRData.Mode mode = XRData.Mode.User; // For use in the inspector only
     public MovementStyle movementStyle = MovementStyle.teleportToMarker;
     public GameObject teleportFader;
     public GameObject theHead;
@@ -190,6 +191,7 @@ public class XRRig_CameraMover : MonoBehaviour, IXRRig_CameraMover
 
 
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    // Checks downwards for an object that can be moved onto
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     public void StandOnGround()
     {

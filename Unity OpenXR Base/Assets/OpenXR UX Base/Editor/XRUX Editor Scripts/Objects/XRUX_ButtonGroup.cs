@@ -32,15 +32,19 @@ public class XRUX_ButtonGroup_Editor : Editor
         XRUX_Editor_Settings.DrawParametersHeading();
         EditorGUILayout.LabelField("Dynamic Buttons, created from the prefab.", XRUX_Editor_Settings.categoryStyle);
         myTarget.buttonPrefab = (GameObject) EditorGUILayout.ObjectField("Button Prefab", myTarget.buttonPrefab, typeof(GameObject), true);
-        myTarget.dynamicButtonSpacing = EditorGUILayout.FloatField("Dynamic Button Spacing", myTarget.dynamicButtonSpacing);
-        EditorGUILayout.LabelField("Titles of Buttons to be created dynamically.  These will appear below the last child Button object.", XRUX_Editor_Settings.helpTextStyle);
-        var prop = serializedObject.FindProperty("dynamicButtons"); EditorGUILayout.PropertyField(prop, true);    
+        if (myTarget.buttonPrefab != null)
+        {
+            myTarget.dynamicButtonSpacing = EditorGUILayout.FloatField("Dynamic Button Spacing", myTarget.dynamicButtonSpacing);
+            EditorGUILayout.LabelField("Titles of Buttons to be created dynamically.  These will appear below the last child Button object.", XRUX_Editor_Settings.helpTextStyle);
+            var prop = serializedObject.FindProperty("dynamicButtons"); EditorGUILayout.PropertyField(prop, true);   
+        } 
 
         XRUX_Editor_Settings.DrawOutputsHeading();
         var prop2 = serializedObject.FindProperty("onChange"); EditorGUILayout.PropertyField(prop2, true);    
  
+        EditorGUILayout.Space();
         serializedObject.ApplyModifiedProperties();
-        EditorUtility.SetDirty(target);
+        if (GUI.changed) EditorUtility.SetDirty(target);
     }
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------

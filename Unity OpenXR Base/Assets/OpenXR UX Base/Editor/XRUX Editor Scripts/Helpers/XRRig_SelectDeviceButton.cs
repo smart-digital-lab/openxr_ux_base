@@ -38,7 +38,7 @@ public class XRRig_SelectDeviceButton_Editor : Editor
         EditorGUILayout.LabelField("Changing color of this GameObject and possible sound", XRUX_Editor_Settings.fieldStyle);
         EditorGUILayout.Space();
         serializedObject.ApplyModifiedProperties();
-        EditorUtility.SetDirty(target);
+        if (GUI.changed) EditorUtility.SetDirty(target);
     }
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -38,6 +38,7 @@ public class XRUX_Keyboard_Editor : Editor
         EditorGUILayout.Space();
 
         serializedObject.ApplyModifiedProperties();
-        EditorUtility.SetDirty(target);    }
+        if (GUI.changed) EditorUtility.SetDirty(target);
+    }
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------

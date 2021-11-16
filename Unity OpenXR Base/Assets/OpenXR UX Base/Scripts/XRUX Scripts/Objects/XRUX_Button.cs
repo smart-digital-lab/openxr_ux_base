@@ -47,6 +47,7 @@ public class XRUX_Button : MonoBehaviour, IXRUX_Button
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Public variables
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    public XRData.Mode mode = XRData.Mode.User; // For use in the inspector only
     public Renderer objectToColor;          // The object that needs to change colour when activated
     public GameObject objectToMove;         // The GameObject that will move when activated
     public Material normalMaterial;         // The material for when not pressed

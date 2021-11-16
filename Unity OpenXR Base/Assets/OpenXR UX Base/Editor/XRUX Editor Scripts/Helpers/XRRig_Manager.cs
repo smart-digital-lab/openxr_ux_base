@@ -34,7 +34,7 @@ public class XRRig_Manager_Editor : Editor
         EditorGUILayout.LabelField("Events on the event queue", XRUX_Editor_Settings.fieldStyle);
         EditorGUILayout.Space();
         serializedObject.ApplyModifiedProperties();
-        EditorUtility.SetDirty(target);
+        if (GUI.changed) EditorUtility.SetDirty(target);
     }
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -35,7 +35,7 @@ public class XRRig_Pointer_Editor : Editor
         EditorGUILayout.LabelField("Activation of the GameObject, or movement of the camera", XRUX_Editor_Settings.fieldStyle);
         EditorGUILayout.Space();
         serializedObject.ApplyModifiedProperties();
-        EditorUtility.SetDirty(target);
+        if (GUI.changed) EditorUtility.SetDirty(target);
     }
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------

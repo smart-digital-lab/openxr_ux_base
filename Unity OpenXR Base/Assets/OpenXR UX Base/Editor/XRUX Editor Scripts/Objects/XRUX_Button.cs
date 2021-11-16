@@ -24,6 +24,7 @@ public class XRUX_Button_Editor : Editor
         XRUX_Button myTarget = (XRUX_Button)target;
 
         XRUX_Editor_Settings.DrawMainHeading("A Movable Button", "A button is a raised object that has something written or drawn on its surface, that can be interacted with using the XR controllers or mouse, and controlled by other XRUX Modules.  It can move, change color and create events when touched and activated.");
+        myTarget.mode = (XRData.Mode) EditorGUILayout.EnumPopup("Inspector Mode", myTarget.mode);
 
         XRUX_Editor_Settings.DrawInputsHeading();
         EditorGUILayout.LabelField("Title", "string | int | float | bool | Vector3 | XRData", XRUX_Editor_Settings.fieldStyle);
@@ -31,21 +32,26 @@ public class XRUX_Button_Editor : Editor
         EditorGUILayout.LabelField("Boolean XRData value to change the button state as if it was being pressed.", XRUX_Editor_Settings.helpTextStyle);
 
         XRUX_Editor_Settings.DrawParametersHeading();
-        EditorGUILayout.LabelField("The object that will change colour when pressed.", XRUX_Editor_Settings.categoryStyle);
-        myTarget.objectToColor = (Renderer) EditorGUILayout.ObjectField("Object to color", myTarget.objectToColor, typeof(Renderer), true);
-        EditorGUILayout.Space();
-        EditorGUILayout.LabelField("The object that will move when pressed.", XRUX_Editor_Settings.categoryStyle);
-        myTarget.objectToMove = (GameObject) EditorGUILayout.ObjectField("Object to move", myTarget.objectToMove, typeof(GameObject), true);
-        EditorGUILayout.Space();
-        EditorGUILayout.LabelField("Materials for the interaction stages.", XRUX_Editor_Settings.categoryStyle);
-        myTarget.normalMaterial = (Material) EditorGUILayout.ObjectField("Normal Material", myTarget.normalMaterial, typeof(Material), true);
-        myTarget.activatedMaterial = (Material) EditorGUILayout.ObjectField("Activated Material", myTarget.activatedMaterial, typeof(Material), true);
-        myTarget.touchedMaterial = (Material) EditorGUILayout.ObjectField("Touched Material", myTarget.touchedMaterial, typeof(Material), true);
+        if (myTarget.mode == XRData.Mode.Advanced)
+        {
+            EditorGUILayout.LabelField("The object that will change colour when pressed.", XRUX_Editor_Settings.categoryStyle);
+            myTarget.objectToColor = (Renderer) EditorGUILayout.ObjectField("Object to color", myTarget.objectToColor, typeof(Renderer), true);
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("The object that will move when pressed.", XRUX_Editor_Settings.categoryStyle);
+            myTarget.objectToMove = (GameObject) EditorGUILayout.ObjectField("Object to move", myTarget.objectToMove, typeof(GameObject), true);
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("Materials for the interaction stages.", XRUX_Editor_Settings.categoryStyle);
+            myTarget.normalMaterial = (Material) EditorGUILayout.ObjectField("Normal Material", myTarget.normalMaterial, typeof(Material), true);
+            myTarget.activatedMaterial = (Material) EditorGUILayout.ObjectField("Activated Material", myTarget.activatedMaterial, typeof(Material), true);
+            myTarget.touchedMaterial = (Material) EditorGUILayout.ObjectField("Touched Material", myTarget.touchedMaterial, typeof(Material), true);
+        }
         EditorGUILayout.Space();
         EditorGUILayout.LabelField("Movement axis (or none), and distance", XRUX_Editor_Settings.categoryStyle);
-        Debug.Log(myTarget.movementAxis);
         myTarget.movementAxis = (XRUX_Button.XRGenericButtonAxis) EditorGUILayout.EnumPopup("Movement Axis", myTarget.movementAxis);
-        myTarget.movementAmount = EditorGUILayout.FloatField("Movement Amount", myTarget.movementAmount);
+        if (myTarget.movementAxis != XRUX_Button.XRGenericButtonAxis.None)
+        {
+            myTarget.movementAmount = EditorGUILayout.FloatField("Movement Amount", myTarget.movementAmount);
+        }
         EditorGUILayout.Space();
         EditorGUILayout.LabelField("Toggle or Momentary Movement Style", XRUX_Editor_Settings.categoryStyle);
         myTarget.movementStyle = (XRUX_Button.XRGenericButtonMovement) EditorGUILayout.EnumPopup("Movement Style", myTarget.movementStyle);
@@ -53,13 +59,16 @@ public class XRUX_Button_Editor : Editor
         EditorGUILayout.Space();
         XRUX_Editor_Settings.DrawOutputsHeading();
         var prop = serializedObject.FindProperty("onChange"); EditorGUILayout.PropertyField(prop, true);    
-        var prop2 = serializedObject.FindProperty("onClick"); EditorGUILayout.PropertyField(prop2, true);    
-        var prop3 = serializedObject.FindProperty("onUnclick"); EditorGUILayout.PropertyField(prop3, true);    
-        var prop4 = serializedObject.FindProperty("onTouch"); EditorGUILayout.PropertyField(prop4, true);   
-        var prop5 = serializedObject.FindProperty("onUntouch"); EditorGUILayout.PropertyField(prop5, true);   
+        if (myTarget.mode == XRData.Mode.Advanced)
+        {
+            var prop2 = serializedObject.FindProperty("onClick"); EditorGUILayout.PropertyField(prop2, true);    
+            var prop3 = serializedObject.FindProperty("onUnclick"); EditorGUILayout.PropertyField(prop3, true);    
+            var prop4 = serializedObject.FindProperty("onTouch"); EditorGUILayout.PropertyField(prop4, true);   
+            var prop5 = serializedObject.FindProperty("onUntouch"); EditorGUILayout.PropertyField(prop5, true); 
+        }  
         EditorGUILayout.Space();
         serializedObject.ApplyModifiedProperties();
-        EditorUtility.SetDirty(target);
+        if (GUI.changed) EditorUtility.SetDirty(target);
     }
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------

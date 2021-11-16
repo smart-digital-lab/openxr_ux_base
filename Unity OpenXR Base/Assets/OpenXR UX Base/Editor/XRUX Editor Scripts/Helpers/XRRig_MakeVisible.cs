@@ -35,7 +35,7 @@ public class XRRig_MakeVisible_Editor : Editor
         EditorGUILayout.LabelField("GameObject visibility", XRUX_Editor_Settings.fieldStyle);
         EditorGUILayout.Space();
         serializedObject.ApplyModifiedProperties();
-        EditorUtility.SetDirty(target);
+        if (GUI.changed) EditorUtility.SetDirty(target);
     }
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------

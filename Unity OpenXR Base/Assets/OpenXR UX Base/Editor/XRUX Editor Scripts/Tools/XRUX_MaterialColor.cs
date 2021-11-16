@@ -35,7 +35,7 @@ public class XRUX_MaterialColour_Editor : Editor
         EditorGUILayout.LabelField("Material color", "color", XRUX_Editor_Settings.fieldStyle);
         EditorGUILayout.Space();
         serializedObject.ApplyModifiedProperties();
-        EditorUtility.SetDirty(target);
+        if (GUI.changed) EditorUtility.SetDirty(target);
     }
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------

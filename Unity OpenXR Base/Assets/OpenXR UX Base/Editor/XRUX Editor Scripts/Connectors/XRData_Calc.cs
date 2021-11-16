@@ -37,7 +37,7 @@ public class XRData_Calc_Editor : Editor
         EditorGUILayout.Space();
 
         serializedObject.ApplyModifiedProperties();
-        EditorUtility.SetDirty(target);
+        if (GUI.changed) EditorUtility.SetDirty(target);
     }
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------

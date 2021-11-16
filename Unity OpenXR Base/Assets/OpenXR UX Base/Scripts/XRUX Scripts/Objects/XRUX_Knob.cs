@@ -37,6 +37,7 @@ public class XRUX_Knob : MonoBehaviour, IXRUX_Knob
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Public variables
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    public XRData.Mode mode = XRData.Mode.User; // For use in the inspector only
     public Renderer objectToColor; // The GameObject for the base of the knob - the one that needs to change colour and move when turned
     public GameObject objectToMove; // The GameObject that will be rotated when clicked and turned
     public Material normalMaterial; // The material for when not pressed

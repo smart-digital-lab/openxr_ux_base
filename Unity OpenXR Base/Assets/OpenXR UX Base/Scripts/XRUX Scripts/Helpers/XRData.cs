@@ -26,6 +26,7 @@ public enum OpenXR_UX_Tags { XREvents, XRLeft, XRRight, XRMuxEvents }
 public class XRData
 {
     public enum XRDataType { INT, FLOAT, BOOL, STRING, VECTOR3 }
+    public enum Mode { User, Advanced }
 
     private XRDataType theType;
     private int intValue = 0;
