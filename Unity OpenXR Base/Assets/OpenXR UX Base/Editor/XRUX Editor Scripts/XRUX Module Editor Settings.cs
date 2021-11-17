@@ -102,6 +102,7 @@ public static class XRUX_Editor_Settings
     }
 
 
+    public static void DrawSetupHeading() { XRUX_Editor_Settings.DrawSubHeading("SETUP"); }
     public static void DrawInputsHeading() { XRUX_Editor_Settings.DrawSubHeading("INPUTS"); }
     public static void DrawParametersHeading() { XRUX_Editor_Settings.DrawSubHeading("PARAMETERS"); }
     public static void DrawOutputsHeading() { XRUX_Editor_Settings.DrawSubHeading("OUTPUTS"); }

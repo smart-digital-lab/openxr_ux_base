@@ -49,9 +49,9 @@ public class XRUX_ButtonGroup : MonoBehaviour, IXRUX_ButtonGroup
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Private variales
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    private List<XRUX_Button> allButtons; // The buttons that are children of this GameObject folowed by the buttons created dynamically.
+    public List<XRUX_Button> allButtons; // The buttons that are children of this GameObject folowed by the buttons created dynamically.
     private bool firstTime = true;
-    private int fixedItems = 0; // The number of fixed Items (ie the ones that are children of this GameObject)
+    public int fixedItems = 0; // The number of fixed Items (ie the ones that are children of this GameObject)
     private int currentButton = 0;
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -76,35 +76,35 @@ public class XRUX_ButtonGroup : MonoBehaviour, IXRUX_ButtonGroup
         // Store the number of fixed items in the list after adding the fixed items to the list.
         fixedItems = allButtons.Count;
 
-        // Create the dynamic buttons (if any).
-        if (dynamicButtons.Length > 0)
-        {
-            if (buttonPrefab == null)
-            {
-                Debug.Log("No Button Prefab to duplicate");
-            }
-            else
-            {
-                int counter = 0;
-                foreach (string title in dynamicButtons)
-                {
-                    // Create a new Button
-                    GameObject newButton = Instantiate(buttonPrefab);
-                    // Get the transform to use as the grouping object
-                    Transform group = this.gameObject.transform;
-                    // Add the new button to the group
-                    newButton.transform.SetParent(group);
-                    // Position it relative to the zero position (going down from the top)
-                    newButton.transform.localPosition = new Vector3(0, (fixedItems + counter) * -dynamicButtonSpacing, 0);
-                    newButton.transform.localRotation = new Quaternion(0, 0, 0, 1);
-                    // Set the title
-                    XRUX_Button buttonScript = newButton.GetComponent<XRUX_Button>();
-                    // Add it to the list of buttons already there.
-                    allButtons.Add(buttonScript);
-                    counter++;
-                }
-            }
-        }
+        // // Create the dynamic buttons (if any).
+        // if (dynamicButtons.Length > 0)
+        // {
+        //     if (buttonPrefab == null)
+        //     {
+        //         Debug.Log("No Button Prefab to duplicate");
+        //     }
+        //     else
+        //     {
+        //         int counter = 0;
+        //         foreach (string title in dynamicButtons)
+        //         {
+        //             // Create a new Button
+        //             GameObject newButton = Instantiate(buttonPrefab);
+        //             // Get the transform to use as the grouping object
+        //             Transform group = this.gameObject.transform;
+        //             // Add the new button to the group
+        //             newButton.transform.SetParent(group);
+        //             // Position it relative to the zero position (going down from the top)
+        //             newButton.transform.localPosition = new Vector3(0, (fixedItems + counter) * -dynamicButtonSpacing, 0);
+        //             newButton.transform.localRotation = new Quaternion(0, 0, 0, 1);
+        //             // Set the title
+        //             XRUX_Button buttonScript = newButton.GetComponent<XRUX_Button>();
+        //             // Add it to the list of buttons already there.
+        //             allButtons.Add(buttonScript);
+        //             counter++;
+        //         }
+        //     }
+        // }
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -127,8 +127,8 @@ public class XRUX_ButtonGroup : MonoBehaviour, IXRUX_ButtonGroup
                 allButtons[counter].onChange.AddListener((XRData theData) => { ButtonChange(theData, temp); });
 
                 // Set the titles of the dynamic items
-                if (counter >= fixedItems)
-                    allButtons[counter].Title(dynamicButtons[counter - fixedItems]);
+                // if (counter >= fixedItems)
+                //     allButtons[counter].Title(dynamicButtons[counter - fixedItems]);
             }
             firstTime = false;
         }

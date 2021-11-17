@@ -22,9 +22,11 @@ public class XRUX_Knob_Editor : Editor
     public override void OnInspectorGUI()
     {
         XRUX_Knob myTarget = (XRUX_Knob)target;
+        myTarget.mode = (XRData.Mode) EditorGUILayout.EnumPopup("Inspector Mode", myTarget.mode);
 
         XRUX_Editor_Settings.DrawMainHeading("A Turnable Knob", "A knob is a turnable object that can be rotated by activating and twisting with the hand controller, or hovering over and using the scroll button on the mouse.");
-        myTarget.mode = (XRData.Mode) EditorGUILayout.EnumPopup("Inspector Mode", myTarget.mode);
+
+        XRUX_Editor_Settings.DrawSetupHeading();
 
         XRUX_Editor_Settings.DrawInputsHeading();
         EditorGUILayout.LabelField("Input", "XRData", XRUX_Editor_Settings.fieldStyle);

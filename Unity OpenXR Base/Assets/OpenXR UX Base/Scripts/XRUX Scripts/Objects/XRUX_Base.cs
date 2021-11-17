@@ -35,6 +35,12 @@ public class XRUX_Base : MonoBehaviour, IXRUX_Base
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Public variables
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    public XRData.Mode mode = XRData.Mode.User; // For use in the inspector only
+    public GameObject theBase;
+    public GameObject theButton;
+    public GameObject theTitlebar;
+    public GameObject theTitle;
+
     public GameObject Maximised; // GameObject to be maximised
     public GameObject Minimised; // GameObject to be minimised
     public bool startMinimised = false; // Whether to start minimised or maximised.

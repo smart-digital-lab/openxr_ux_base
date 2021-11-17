@@ -27,9 +27,9 @@ public class XRRig_CameraMover_Editor : Editor
         myTarget.mode = (XRData.Mode) EditorGUILayout.EnumPopup("Inspector Mode", myTarget.mode);
 
         XRUX_Editor_Settings.DrawInputsHeading();
+        EditorGUILayout.LabelField("Inputs from the XR Controllers", XRUX_Editor_Settings.fieldStyle);
         if (myTarget.mode == XRData.Mode.Advanced)
         {
-            EditorGUILayout.LabelField("Inputs from the XR Controllers", XRUX_Editor_Settings.fieldStyle);
             EditorGUILayout.LabelField("PutOnBrakes", XRUX_Editor_Settings.fieldStyle);
             EditorGUILayout.LabelField("StandOnGround", XRUX_Editor_Settings.fieldStyle);
             EditorGUILayout.LabelField("SetMovementStyle", "XRData", XRUX_Editor_Settings.fieldStyle);
@@ -50,14 +50,17 @@ public class XRRig_CameraMover_Editor : Editor
         }
 
         EditorGUILayout.Space();
-        if (myTarget.movementStyle == XRRig_CameraMover.MovementStyle.teleportToMarker)
+        if (myTarget.mode == XRData.Mode.Advanced)
         {
             EditorGUILayout.LabelField("Teleportation", XRUX_Editor_Settings.categoryStyle);
         }
         myTarget.movementStyle = (XRRig_CameraMover.MovementStyle) EditorGUILayout.EnumPopup("Movement style", myTarget.movementStyle);
         if (myTarget.movementStyle == XRRig_CameraMover.MovementStyle.teleportToMarker)
         {
-            myTarget.teleportFader = (GameObject) EditorGUILayout.ObjectField("The Player object", myTarget.teleportFader, typeof(GameObject), true);
+            if (myTarget.mode == XRData.Mode.Advanced)
+            {
+                myTarget.teleportFader = (GameObject) EditorGUILayout.ObjectField("The Player object", myTarget.teleportFader, typeof(GameObject), true);
+            }
             myTarget.teleportFadeTime = EditorGUILayout.FloatField("Fade in and out time (s)", myTarget.teleportFadeTime);
         }
          

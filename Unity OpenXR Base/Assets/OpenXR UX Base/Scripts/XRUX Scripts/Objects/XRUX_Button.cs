@@ -48,6 +48,14 @@ public class XRUX_Button : MonoBehaviour, IXRUX_Button
     // Public variables
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     public XRData.Mode mode = XRData.Mode.User; // For use in the inspector only
+    public float width, height, thickness;  // For use in the inspector only
+    public bool affectText = false;         // For use in the inspector only
+    public bool affectCollider = false;     // For use in the inspector only
+    public Vector3 textOffset = new Vector3(0, 0, 0); // For use in the inspector only
+    public Vector3 textScale = new Vector3(0, 0, 0);  // For use in the inspector only
+    public GameObject objectToResize;       // For use in the inspector only
+
+    public GameObject theTitle;             // For use in the inspector only
     public Renderer objectToColor;          // The object that needs to change colour when activated
     public GameObject objectToMove;         // The GameObject that will move when activated
     public Material normalMaterial;         // The material for when not pressed
