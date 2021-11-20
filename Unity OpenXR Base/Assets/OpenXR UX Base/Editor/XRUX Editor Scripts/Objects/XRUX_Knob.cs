@@ -26,8 +26,6 @@ public class XRUX_Knob_Editor : Editor
 
         XRUX_Editor_Settings.DrawMainHeading("A Turnable Knob", "A knob is a turnable object that can be rotated by activating and twisting with the hand controller, or hovering over and using the scroll button on the mouse.");
 
-        XRUX_Editor_Settings.DrawSetupHeading();
-
         XRUX_Editor_Settings.DrawInputsHeading();
         EditorGUILayout.LabelField("Input", "XRData", XRUX_Editor_Settings.fieldStyle);
         EditorGUILayout.LabelField("Float XRData value to change the rotation of the knob just as if it was being turned by hand.", XRUX_Editor_Settings.helpTextStyle);

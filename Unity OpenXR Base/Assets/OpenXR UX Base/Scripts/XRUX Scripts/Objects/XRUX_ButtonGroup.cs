@@ -39,7 +39,7 @@ public class XRUX_ButtonGroup : MonoBehaviour, IXRUX_ButtonGroup
     // Public variables
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     public GameObject buttonPrefab;    // Link to the button prefab
-    public string[] dynamicButtons;    // Buttons that are created dynamically with the titles filled in from here.
+    public ArrayList dynamicButtons = new ArrayList();    // Buttons that are created dynamically with the titles filled in from here.
     public float dynamicButtonSpacing = 0.025f;
     public UnityXRDataEvent onChange;
     // ------------------------------------------------------------------------------------------------------------------------------------------------------

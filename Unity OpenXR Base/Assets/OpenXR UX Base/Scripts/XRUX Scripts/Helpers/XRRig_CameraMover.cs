@@ -23,6 +23,7 @@ public interface IXRRig_CameraMover
 {
     void PutOnBrakes();                         // Slow down all movement
     void SetMovementStyle(XRData selection);    // Set the movement style (0 = teleport, 1 = move)
+    void SetRotationStyle(XRData selection);    // Set the rotation style (0 = stepped, 1 = smooth)
     void StandOnGround();                       // Move the viewpoint to standing on the ground
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -55,6 +56,7 @@ public class XRRig_CameraMover : MonoBehaviour, IXRRig_CameraMover
     public MovementDevice movementPointer = MovementDevice.Controller;
     public bool otherThumbstickForHeight = true;
     public float accelerationFactor = 1.0f;
+    public float frictionFactor = 1.0f;
     public float maximumVelocity = 0.05f;
     public float maximumFlyingHeight = 20.0f;
     public RotationStyle rotationStyle = RotationStyle.Stepped;
@@ -161,7 +163,7 @@ public class XRRig_CameraMover : MonoBehaviour, IXRRig_CameraMover
         StandOnGround();
 
         // Adjust some of the input parameters
-        accelerationFactor = Mathf.Clamp(accelerationFactor, 1.0f, 5.0f);
+        // accelerationFactor = Mathf.Clamp(accelerationFactor, 1.0f, 5.0f);
 
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -174,6 +176,10 @@ public class XRRig_CameraMover : MonoBehaviour, IXRRig_CameraMover
     public void SetMovementStyle(XRData selection)
     {
         movementStyle = (selection.ToInt() == 0) ? MovementStyle.moveToMarker : MovementStyle.teleportToMarker;
+    }
+    public void SetRotationStyle(XRData selection)
+    {
+        rotationStyle = (selection.ToInt() == 0) ? RotationStyle.Stepped : RotationStyle.Smooth;
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -362,9 +368,9 @@ public class XRRig_CameraMover : MonoBehaviour, IXRRig_CameraMover
 
         // Friction is used to slow the movement once no controls are being pushed
         Vector3 friction = new Vector3(
-            velocity.x * (0.5f + hitFrictionFactor) * Time.deltaTime,
-            velocity.y * (0.5f + hitFrictionFactor) * Time.deltaTime,  
-            velocity.z * (0.5f + hitFrictionFactor) * Time.deltaTime
+            velocity.x * (0.5f + hitFrictionFactor) * frictionFactor *  Time.deltaTime,
+            velocity.y * (0.5f + hitFrictionFactor) * frictionFactor *Time.deltaTime,  
+            velocity.z * (0.5f + hitFrictionFactor) * frictionFactor *Time.deltaTime
         );
 
         // The velocity change is the previous velocity + the change through acceleration - friction

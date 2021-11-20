@@ -22,26 +22,53 @@ public class XRUX_ButtonGroup_Editor : Editor
 {
     int prevDynamicButtonsLength = 0;
 
+    void OnEnable()
+    {
+        XRUX_ButtonGroup myTarget = (XRUX_ButtonGroup)target;
+        XRUX_Button[] dynamicButtons = myTarget.GetComponentsInChildren<XRUX_Button>();
+        myTarget.dynamicButtons.Clear();
+        foreach (XRUX_Button theButton in dynamicButtons)
+        {
+            string buttonTitle = theButton.GetComponentInChildren<TextMeshPro>().text;
+            myTarget.dynamicButtons.Add(buttonTitle);
+        }
+    }
+
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    // Main function for InspectorGUI
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
     public override void OnInspectorGUI()
     {
+        Undo.RecordObject(target, "Target changed");
+
         XRUX_ButtonGroup myTarget = (XRUX_ButtonGroup)target;
 
         XRUX_Editor_Settings.DrawMainHeading("A Group of Buttons", "A group of buttons where one can be pressed at a time.  Set the prefab to use, then add as many buttons as required by entering their titles.");
 
         XRUX_Editor_Settings.DrawSetupHeading();
-        // EditorGUILayout.LabelField("Dynamic Buttons, created from the prefab.", XRUX_Editor_Settings.categoryStyle);
+        // EditorGUILayout.LabelField("Dynamic Buttons, created from the prefab.", XRUX_Editor_Settings.categoryStyle); // There seems to be a bug in unity and this doesn't work, hence the workaround below
         myTarget.buttonPrefab = (GameObject) EditorGUILayout.ObjectField("Button Prefab", myTarget.buttonPrefab, typeof(GameObject), true);
         if (myTarget.buttonPrefab != null)
         {
             EditorGUI.BeginChangeCheck();
             myTarget.dynamicButtonSpacing = EditorGUILayout.FloatField("Dynamic Button Spacing", myTarget.dynamicButtonSpacing);
             EditorGUILayout.LabelField("Titles of Buttons to be created dynamically.", XRUX_Editor_Settings.helpTextStyle);
-            var prop = serializedObject.FindProperty("dynamicButtons"); EditorGUILayout.PropertyField(prop, true);
-            if ((myTarget.dynamicButtons.Length != prevDynamicButtonsLength) || EditorGUI.EndChangeCheck())
+            for (int i=0; i < myTarget.dynamicButtons.Count; i++)
+            {
+                myTarget.dynamicButtons[i] = EditorGUILayout.TextField("Button " + i.ToString(), (string) myTarget.dynamicButtons[i]);
+            }
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(Screen.width-70);
+            if (GUILayout.Button("+", GUILayout.Width (20))) myTarget.dynamicButtons.Add("");
+            if (GUILayout.Button("-", GUILayout.Width (20)) && (myTarget.dynamicButtons.Count > 0)) myTarget.dynamicButtons.RemoveAt(myTarget.dynamicButtons.Count-1);
+            GUILayout.EndHorizontal();
+
+            if ((myTarget.dynamicButtons.Count != prevDynamicButtonsLength) || EditorGUI.EndChangeCheck())
             {
                 serializedObject.ApplyModifiedProperties();
                 CreateDynamicButtons(myTarget);
-                prevDynamicButtonsLength = myTarget.dynamicButtons.Length;
+                prevDynamicButtonsLength = myTarget.dynamicButtons.Count;
             }
         }
 
@@ -56,10 +83,14 @@ public class XRUX_ButtonGroup_Editor : Editor
  
         EditorGUILayout.Space();
         serializedObject.ApplyModifiedProperties();
-        if (GUI.changed) EditorUtility.SetDirty(target);
     }
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
+
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    // Create a set of entries for the button titles
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
     private void CreateDynamicButtons(XRUX_ButtonGroup myTarget)
     {
         // Create the dynamic buttons (if any).
@@ -76,12 +107,14 @@ public class XRUX_ButtonGroup_Editor : Editor
             {
                 DestroyImmediate(buttonScript.gameObject, true);
             }
-                        
+            
+            // Create new buttons
             int counter = 0;
             foreach (string title in myTarget.dynamicButtons)
             {
                 // Create a new Button
                 GameObject newButton = Instantiate(myTarget.buttonPrefab);
+                newButton.gameObject.name = title;
                 // Get the transform to use as the grouping object
                 Transform group = myTarget.gameObject.transform;
                 // Add the new button to the group
@@ -107,5 +140,6 @@ public class XRUX_ButtonGroup_Editor : Editor
             }
         }
     }
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------

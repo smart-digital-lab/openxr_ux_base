@@ -75,6 +75,7 @@ public class XRRig_CameraMover_Editor : Editor
             EditorGUILayout.LabelField("Movement Parameters", XRUX_Editor_Settings.categoryStyle);
             EditorGUILayout.LabelField("Acceleration is applied as long as the controller button is held, then friction slows down the movement.", XRUX_Editor_Settings.helpTextStyle);
             myTarget.accelerationFactor = EditorGUILayout.FloatField("Acceleration", myTarget.accelerationFactor);
+            myTarget.frictionFactor = EditorGUILayout.FloatField("Friction", myTarget.frictionFactor);
             myTarget.maximumVelocity = EditorGUILayout.FloatField("Maximum velocity", myTarget.maximumVelocity);
             myTarget.maximumFlyingHeight = EditorGUILayout.FloatField("Maximum height to fly", myTarget.maximumFlyingHeight);
 

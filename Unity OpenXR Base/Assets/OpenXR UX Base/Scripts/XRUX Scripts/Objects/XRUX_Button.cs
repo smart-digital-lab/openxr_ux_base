@@ -44,30 +44,23 @@ public class XRUX_Button : MonoBehaviour, IXRUX_Button
     public enum XRGenericButtonAxis { X, Y, Z, None };
     public enum XRGenericButtonMovement { Toggle, Momentary };
 
-    // ------------------------------------------------------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------
     // Public variables
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     public XRData.Mode mode = XRData.Mode.User; // For use in the inspector only
-    public float width, height, thickness;  // For use in the inspector only
-    public bool affectText = false;         // For use in the inspector only
-    public bool affectCollider = false;     // For use in the inspector only
-    public Vector3 textOffset = new Vector3(0, 0, 0); // For use in the inspector only
-    public Vector3 textScale = new Vector3(0, 0, 0);  // For use in the inspector only
-    public GameObject objectToResize;       // For use in the inspector only
 
-    public GameObject theTitle;             // For use in the inspector only
     public Renderer objectToColor;          // The object that needs to change colour when activated
     public GameObject objectToMove;         // The GameObject that will move when activated
     public Material normalMaterial;         // The material for when not pressed
     public Material activatedMaterial;      // The material for when pressed
     public Material touchedMaterial;        // The material for when touched
     public XRGenericButtonAxis movementAxis = XRGenericButtonAxis.Z;
-    public float movementAmount = 0.004f;
+    public float movementAmount;            // Amount of movement along the selected axis
     public XRGenericButtonMovement movementStyle = XRGenericButtonMovement.Toggle;
     public UnityXRDataEvent onChange;       // Changes on click or unclick, with boolean
     public UnityEvent onClick;              // Functions to call when click-down
     public UnityEvent onUnclick;            // Functions to call when click-up
-    public UnityEvent onTouch;          // Functions to call when first touched
+    public UnityEvent onTouch;              // Functions to call when first touched
     public UnityEvent onUntouch;            // Functions to call when first touched
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
