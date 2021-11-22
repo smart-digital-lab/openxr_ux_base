@@ -46,21 +46,20 @@ public class XRUX_Knob_Sizer : MonoBehaviour
         {
             // Main object position and scale
             objectToResize.transform.localScale = new Vector3(width, height, thickness);
-            Bounds objectBounds = GetMaxBounds(objectToResize);
             objectToResize.transform.localPosition = new Vector3(0, 0, 0);
 
             // Collider position and scale
             if (theCollider != null)
             {
-                theCollider.center = new Vector3(0, 0, -objectBounds.size.z / 2.0f);
-                theCollider.size = objectBounds.size * 0.75f; //objectToResize.transform.localScale;
+                theCollider.center = new Vector3(0, 0, -thickness);
+                theCollider.size = new Vector3(width * 0.75f, height * 0.75f, thickness * 2.0f);
             }
             RectTransform titleRect = (titleObject == null) ? null : titleObject.GetComponent<RectTransform>();
 
             // Title position, scale
             if (titleObject != null)
             {
-                titleObject.transform.localPosition = new Vector3(objectToResize.transform.localPosition.x, objectToResize.transform.localPosition.y - height / 2.0f, -0.001f);
+                titleObject.transform.localPosition = new Vector3(objectToResize.transform.localPosition.x, objectToResize.transform.localPosition.y - height / 2.0f, -0.002f);
 
                 if (titleRect != null) 
                 {
@@ -69,18 +68,6 @@ public class XRUX_Knob_Sizer : MonoBehaviour
             }
         }      
     }
-
-
-
-    private Bounds GetMaxBounds(GameObject g)
-    {
-        var renderers = g.GetComponentsInChildren<Renderer>();
-        if (renderers.Length == 0) return new Bounds(g.transform.position, Vector3.zero);
-        var b = renderers[0].bounds;
-        foreach (Renderer r in renderers) {
-            b.Encapsulate(r.bounds);
-        }
-        return b;
-    }
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------

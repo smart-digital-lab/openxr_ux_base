@@ -60,6 +60,8 @@ public class XRUX_Base_Sizer_Editor : Editor
     {
         TextMeshPro textDisplay = (mainTarget.theTitle == null) ? null : mainTarget.theTitle.GetComponent<TextMeshPro>();
         Undo.RecordObject(target, "Target changed");
+        Undo.RecordObject(myTarget, "myTarget changed");
+        Undo.RecordObject(textDisplay, "textDisplay changed");
 
         // --------------------------------------------------
         XRUX_Editor_Settings.DrawSetupHeading();

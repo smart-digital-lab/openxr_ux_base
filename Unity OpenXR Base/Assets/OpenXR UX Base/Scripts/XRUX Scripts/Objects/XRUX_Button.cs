@@ -271,16 +271,22 @@ public class XRUX_Button : MonoBehaviour, IXRUX_Button
             if (objectToColor != null) objectToColor.material = activatedMaterial;
             if (objectToMove != null) 
             {
+                Vector3 localSize = gameObject.transform.localScale;
+                XRUX_Button_Sizer sizerScript = gameObject.GetComponent<XRUX_Button_Sizer>();
+                if (sizerScript != null)
+                {
+                    localSize = sizerScript.objectToResize.transform.localScale;
+                }
                 switch (movementAxis)
                 {
                     case XRGenericButtonAxis.X:
-                        objectToMove.transform.localPosition = new Vector3(startPosition.x + movementAmount, startPosition.y, startPosition.z);
+                        objectToMove.transform.localPosition = new Vector3(startPosition.x + localSize.x * movementAmount, startPosition.y, startPosition.z);
                         break;
                     case XRGenericButtonAxis.Y:
-                        objectToMove.transform.localPosition = new Vector3(startPosition.x, startPosition.y + movementAmount, startPosition.z);
+                        objectToMove.transform.localPosition = new Vector3(startPosition.x, startPosition.y + localSize.y * movementAmount, startPosition.z);
                         break;
-                    case XRGenericButtonAxis.Z:
-                        objectToMove.transform.localPosition = new Vector3(startPosition.x, startPosition.y, startPosition.z + movementAmount);
+                    case XRGenericButtonAxis.Z:                       
+                        objectToMove.transform.localPosition = new Vector3(startPosition.x, startPosition.y, startPosition.z + localSize.z * movementAmount);
                         break;
                     default:
                         break;

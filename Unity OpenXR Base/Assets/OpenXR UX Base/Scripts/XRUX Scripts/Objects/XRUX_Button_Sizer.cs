@@ -11,6 +11,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 // Main Class
@@ -51,8 +52,8 @@ public class XRUX_Button_Sizer : MonoBehaviour
             // Collider position and scale
             if (theCollider != null)
             {
-                theCollider.center = new Vector3(0, 0, 0);
-                theCollider.size = objectToResize.transform.localScale;
+                theCollider.center = new Vector3(0, 0, -thickness / 2.0f);
+                theCollider.size = new Vector3(width, height, thickness);
             }
             objectToResize.transform.localScale = new Vector3(width, height, thickness);
             RectTransform titleRect = (titleObject == null) ? null : titleObject.GetComponent<RectTransform>();
@@ -60,7 +61,7 @@ public class XRUX_Button_Sizer : MonoBehaviour
             // Title position, scale
             if (titleObject != null)
             {
-                titleObject.transform.localPosition = new Vector3(objectToResize.transform.localPosition.x, objectToResize.transform.localPosition.y, objectToResize.transform.localPosition.z - thickness / 2.0f - 0.0001f);
+                titleObject.transform.localPosition = new Vector3(objectToResize.transform.localPosition.x, objectToResize.transform.localPosition.y, objectToResize.transform.localPosition.z - thickness / 1.96f);
 
                 if (titleRect != null) 
                 {
@@ -68,14 +69,6 @@ public class XRUX_Button_Sizer : MonoBehaviour
                 }
             }
         }      
-    }
-
-
-    
-    public void SetMovement(float movement)
-    {
-        XRUX_Button myTarget = (XRUX_Button)gameObject.GetComponent<XRUX_Button>();
-        if (myTarget != null) myTarget.movementAmount = movement;
     }
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------

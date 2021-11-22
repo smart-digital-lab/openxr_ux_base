@@ -30,7 +30,6 @@ public class XRUX_Base_Sizer : MonoBehaviour
     public void SetSize(float width, float height, float thickness)
     {
         RectTransform titleRect = (theTitle == null) ? null : theTitle.GetComponent<RectTransform>();
-        XRUX_Button minButtonScript = (minimiseButton == null) ? null : minimiseButton.GetComponent<XRUX_Button>();
         XRUX_Button_Sizer minButtonScriptSizer = (minimiseButton == null) ? null : minimiseButton.GetComponent<XRUX_Button_Sizer>();
         XRUX_Button_Sizer maxButtonScriptSizer = (maximiseButton == null) ? null : maximiseButton.GetComponent<XRUX_Button_Sizer>();
 
@@ -43,16 +42,16 @@ public class XRUX_Base_Sizer : MonoBehaviour
                 theBase.transform.localPosition = new Vector3(0, 0, -thickness / 2);
 
                 // Set the titlebar and minimise button position and size
-                if ((minimiseButton != null) && (minButtonScript != null))
+                if (minimiseButton != null)
                 {
-                    float buttonWidth = minButtonScript.objectToColor.transform.localScale.x;
+                    float buttonWidth = minButtonScriptSizer.objectToResize.transform.localScale.x;
                     theTitlebar.transform.localScale = new Vector3(width - buttonWidth, theTitlebar.transform.localScale.y, thickness);
                     theTitlebar.transform.localPosition = new Vector3(theBase.transform.localPosition.x - buttonWidth / 2, height / 2, -thickness / 2);
                     if (minButtonScriptSizer != null) minButtonScriptSizer.SetThickness(thickness);
 
                     if (theTitle != null)
                     {
-                        theTitle.transform.localPosition = new Vector3(theBase.transform.localPosition.x - buttonWidth / 2, height / 2 - theTitlebar.transform.localScale.y / 2 + 0.001f, theBase.transform.localPosition.z - theTitlebar.transform.localScale.z / 2.0f - 0.0001f);
+                        theTitle.transform.localPosition = new Vector3(theBase.transform.localPosition.x - buttonWidth / 2, height / 2 - theTitlebar.transform.localScale.y / 2 + 0.001f, theBase.transform.localPosition.z - theTitlebar.transform.localScale.z / 2.0f - 0.0002f);
                     }
                     if (titleRect != null) 
                     {

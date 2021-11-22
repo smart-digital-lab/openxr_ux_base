@@ -37,18 +37,15 @@ public class XRUX_Button_Sizer_Editor : Editor
     {
         mainTarget = (XRUX_Button_Sizer)target;
         myTarget = (XRUX_Button)mainTarget.gameObject.GetComponent<XRUX_Button>();
+
         if (mainTarget.objectToResize != null)
         {
             width = mainTarget.objectToResize.transform.localScale.x;
             height = mainTarget.objectToResize.transform.localScale.y;
             thickness = mainTarget.objectToResize.transform.localScale.z;
         }
-        // if (myTarget != null)
-        // {
-        //     movement = thickness / 2.0f; //myTarget.movementAmount;
-        //     Debug.Log("Movement in " + movement);
-        // }    
-        //serializedObject.ApplyModifiedProperties();
+ 
+        serializedObject.ApplyModifiedProperties();
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -61,6 +58,8 @@ public class XRUX_Button_Sizer_Editor : Editor
     {
         TextMeshPro textDisplay = (mainTarget.titleObject == null) ? null : mainTarget.titleObject.GetComponent<TextMeshPro>();
         Undo.RecordObject(target, "Target changed");
+        Undo.RecordObject(myTarget, "myTarget changed");
+        Undo.RecordObject(textDisplay, "textDisplay changed");
 
         // --------------------------------------------------
         XRUX_Editor_Settings.DrawSetupHeading();
@@ -72,12 +71,10 @@ public class XRUX_Button_Sizer_Editor : Editor
         width = EditorGUILayout.DelayedFloatField("Width", width);
         height = EditorGUILayout.DelayedFloatField("Height", height); 
         thickness = EditorGUILayout.DelayedFloatField("Thickness", thickness);
-        // EditorGUI.BeginChangeCheck();
-        // if (myTarget.movementAxis != XRUX_Button.XRGenericButtonAxis.None)
-        // {
-        //     movement = EditorGUILayout.DelayedFloatField("Movement Amount", movement);
-        // }
-        // if (EditorGUI.EndChangeCheck()) myTarget.movementAmount = movement;
+        if (myTarget.movementAxis != XRUX_Button.XRGenericButtonAxis.None)
+        {
+            myTarget.movementAmount = EditorGUILayout.DelayedFloatField("Movement Ratio", myTarget.movementAmount);
+        }
         // --------------------------------------------------
         // Inputs related to the title and collider
         // --------------------------------------------------
@@ -96,11 +93,10 @@ public class XRUX_Button_Sizer_Editor : Editor
         }
 
         // --------------------------------------------------
-        // Set size
+        // Set size and movement
         // --------------------------------------------------
         mainTarget.SetSize(width, height, thickness);
-        mainTarget.SetMovement(thickness / 2.0f);
-
+ 
         // --------------------------------------------------
         // Update changes
         // --------------------------------------------------

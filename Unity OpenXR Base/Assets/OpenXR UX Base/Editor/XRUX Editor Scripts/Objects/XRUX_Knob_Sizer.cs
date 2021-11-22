@@ -56,7 +56,9 @@ public class XRUX_Knob_Sizer_Editor : Editor
     {
         TextMeshPro textDisplay = (mainTarget.titleObject == null) ? null : mainTarget.titleObject.GetComponent<TextMeshPro>();
         Undo.RecordObject(target, "Target changed");
-
+        Undo.RecordObject(myTarget, "myTarget changed");
+        Undo.RecordObject(textDisplay, "textDisplay changed");
+        
         // --------------------------------------------------
         XRUX_Editor_Settings.DrawSetupHeading();
         // --------------------------------------------------

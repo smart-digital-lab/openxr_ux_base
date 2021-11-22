@@ -21,9 +21,9 @@ public class XRUX_RadioButton_Sizer : MonoBehaviour
     public GameObject objectToResize;           // The main visual element to resize
 
 
-    // ----------------------------------------------------------------------------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Set just the thickness of the knob
-    // ----------------------------------------------------------------------------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
     public void SetThickness(float thickness)
     {
         if (objectToResize != null)
@@ -31,13 +31,13 @@ public class XRUX_RadioButton_Sizer : MonoBehaviour
             SetSize(objectToResize.transform.localScale.x, objectToResize.transform.localScale.y, thickness);
         }
     }
-    // ----------------------------------------------------------------------------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 
-    // ----------------------------------------------------------------------------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Set all the dimensions of the knob, and makes sure the text is in the right place
-    // ----------------------------------------------------------------------------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
     public void SetSize(float width, float height, float thickness)
     {
         BoxCollider theCollider = transform.GetComponent<BoxCollider>();
@@ -47,20 +47,18 @@ public class XRUX_RadioButton_Sizer : MonoBehaviour
         {
             // Main object position and scale
             objectToResize.transform.localScale = new Vector3(width, height, thickness);
-            Bounds objectBounds = GetMaxBounds(objectToResize);
-            objectToResize.transform.localPosition = new Vector3(0, 0, 0);
-
             // Collider position and scale
             if (theCollider != null)
             {
-                theCollider.center = new Vector3(0, 0, -objectBounds.size.z / 2.0f);
-                theCollider.size = objectBounds.size * 0.75f; //objectToResize.transform.localScale;
+                theCollider.center = new Vector3(0, 0, -thickness * 1.5f);
+                theCollider.size = new Vector3(width * 0.75f, height * 0.75f, thickness * 3.0f);
             }
+            objectToResize.transform.localPosition = new Vector3(0, 0, 0);
 
             // Title position, scale
             if (titleObject != null)
             {
-                titleObject.transform.localPosition = new Vector3(objectToResize.transform.localPosition.x + width / 1.3f, objectToResize.transform.localPosition.y, -0.001f);
+                titleObject.transform.localPosition = new Vector3(objectToResize.transform.localPosition.x + width / 1.3f, objectToResize.transform.localPosition.y, -0.002f);
 
                 if (titleRect != null) 
                 {
@@ -69,18 +67,6 @@ public class XRUX_RadioButton_Sizer : MonoBehaviour
             }
         }      
     }
-
-
-
-    private Bounds GetMaxBounds(GameObject g)
-    {
-        var renderers = g.GetComponentsInChildren<Renderer>();
-        if (renderers.Length == 0) return new Bounds(g.transform.position, Vector3.zero);
-        var b = renderers[0].bounds;
-        foreach (Renderer r in renderers) {
-            b.Encapsulate(r.bounds);
-        }
-        return b;
-    }
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -56,6 +56,8 @@ public class XRUX_RadioButton_Sizer_Editor : Editor
     {
         TextMeshPro textDisplay = (mainTarget.titleObject == null) ? null : mainTarget.titleObject.GetComponent<TextMeshPro>();
         Undo.RecordObject(target, "Target changed");
+        Undo.RecordObject(myTarget, "myTarget changed");
+        Undo.RecordObject(textDisplay, "textDisplay changed");
 
         // --------------------------------------------------
         XRUX_Editor_Settings.DrawSetupHeading();
@@ -69,14 +71,14 @@ public class XRUX_RadioButton_Sizer_Editor : Editor
         thickness = EditorGUILayout.DelayedFloatField("Thickness", thickness);
         if (myTarget.movementAxis != XRUX_Button.XRGenericButtonAxis.None)
         {
-            myTarget.movementAmount = EditorGUILayout.FloatField("Movement Amount", myTarget.movementAmount);
+            myTarget.movementAmount = EditorGUILayout.FloatField("Movement Ratio", myTarget.movementAmount);
         }
         // --------------------------------------------------
         // Inputs related to the title and collider
         // --------------------------------------------------
         if (textDisplay != null)
         {
-            textDisplay.text = EditorGUILayout.TextField("Text on knob", textDisplay.text);
+            textDisplay.text = EditorGUILayout.TextField("Text on Radio Button", textDisplay.text);
         }
 
         // --------------------------------------------------
