@@ -24,6 +24,7 @@ public interface IXRRig_CameraMover
     void PutOnBrakes();                         // Slow down all movement
     void SetMovementStyle(XRData selection);    // Set the movement style (0 = teleport, 1 = move)
     void SetRotationStyle(XRData selection);    // Set the rotation style (0 = stepped, 1 = smooth)
+    void SetRotationAngle(XRData newAngle);     // Set the rotation angle (degrees)
     void StandOnGround();                       // Move the viewpoint to standing on the ground
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -38,9 +39,8 @@ public class XRRig_CameraMover : MonoBehaviour, IXRRig_CameraMover
     public enum MovementStyle   { teleportToMarker, moveToMarker }
     public enum MovementHand    { Left, Right }
     public enum MovementDevice  { Head, Controller }
-    public enum XRType { Immersive_XR, Desktop_XR }
-
-    public enum RotationStyle { Stepped, Smooth }
+    public enum XRType          { Immersive_XR, Desktop_XR }
+    public enum RotationStyle   { Stepped, Smooth }
 
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Public variables
@@ -181,6 +181,10 @@ public class XRRig_CameraMover : MonoBehaviour, IXRRig_CameraMover
     {
         rotationStyle = (selection.ToInt() == 0) ? RotationStyle.Stepped : RotationStyle.Smooth;
     }
+    public void SetRotationAngle(XRData newAngle)
+    {
+        steppingAngle = newAngle.ToFloat();
+    }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -226,7 +230,7 @@ public class XRRig_CameraMover : MonoBehaviour, IXRRig_CameraMover
 
 
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    // Fade the view and move
+    // Fade the view and move (to be called from the update function).
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     private void DoFadeAndMove()
     {
@@ -293,7 +297,7 @@ public class XRRig_CameraMover : MonoBehaviour, IXRRig_CameraMover
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Find distance above areas
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    private bool heightAbove(Vector3 position, out float height)
+    private bool HeightAbove(Vector3 position, out float height)
     {
         RaycastHit hit;
         float headHeight = (theHead == null) ? 2.0f : theHead.transform.position.y - transform.position.y;
@@ -345,7 +349,7 @@ public class XRRig_CameraMover : MonoBehaviour, IXRRig_CameraMover
             {
                 // Sliding along to the target
                 // Essentially a spring equation...
-                acceleration = (targetDestination - transform.position) * 0.1f;
+                acceleration = (targetDestination - transform.position) * Time.deltaTime;
 
                 // Decelerate as we near the target (ie damping of the spring) so we don't overshoot and bounce back
                 hitFrictionFactor = 20.0f / (1.0f + Vector3.Distance(transform.position, targetDestination));
@@ -366,11 +370,11 @@ public class XRRig_CameraMover : MonoBehaviour, IXRRig_CameraMover
         // Friction is based on Velocity (ie Kinetic Friction)
         Vector3 deltaVelocity = acceleration * accelerationFactor * Time.deltaTime;
 
-        // Friction is used to slow the movement once no controls are being pushed
-        Vector3 friction = new Vector3(
-            velocity.x * (0.5f + hitFrictionFactor) * frictionFactor *  Time.deltaTime,
-            velocity.y * (0.5f + hitFrictionFactor) * frictionFactor *Time.deltaTime,  
-            velocity.z * (0.5f + hitFrictionFactor) * frictionFactor *Time.deltaTime
+        // Friction is used to slow the movement once no controls are being pushed.  Friction is a function of velocity.
+        Vector3 friction = new (
+            velocity.x * (0.5f + hitFrictionFactor) * frictionFactor * Time.deltaTime,
+            velocity.y * (0.5f + hitFrictionFactor) * frictionFactor * Time.deltaTime,  
+            velocity.z * (0.5f + hitFrictionFactor) * frictionFactor * Time.deltaTime
         );
 
         // The velocity change is the previous velocity + the change through acceleration - friction
@@ -404,7 +408,7 @@ public class XRRig_CameraMover : MonoBehaviour, IXRRig_CameraMover
 
                 // Check if we are near the ground
                 float groundHeight = 0.0f;
-                bool hittingGround = heightAbove(newPosition, out groundHeight);
+                bool hittingGround = HeightAbove(newPosition, out groundHeight);
 
                 // Alow half a second to start flying, or if getting really close to a 'ground' object
                 if ((Time.time - startFlyingTime) > 0.5f)
@@ -429,7 +433,7 @@ public class XRRig_CameraMover : MonoBehaviour, IXRRig_CameraMover
             {
                 // Do the movement
                 float groundHeight = 0.0f;
-                if (heightAbove(newPosition, out groundHeight))
+                if (HeightAbove(newPosition, out groundHeight))
                 {
                     transform.position = new Vector3(newPosition.x, newPosition.y + groundHeight, newPosition.z);
                 }
@@ -515,7 +519,6 @@ public class XRRig_CameraMover : MonoBehaviour, IXRRig_CameraMover
             RaycastHit hit;
 
             // Head Movement
-            Vector3 mousePos = Input.mousePosition;
             float xpos = Mathf.Clamp((Input.mousePosition.x - Screen.width / 2.0f) / (Screen.width / 2.0f), -1.0f, 1.0f);
             float ypos = Mathf.Clamp((Input.mousePosition.y - Screen.height / 2.0f) / (Screen.height / 2.0f), -1.0f, 1.0f);
 
@@ -580,7 +583,7 @@ public class XRRig_CameraMover : MonoBehaviour, IXRRig_CameraMover
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Remove the instructions object from view
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    public void TestAndRemoveInstructions()
+    private void TestAndRemoveInstructions()
     {
         if (!moved)
         {
@@ -595,7 +598,7 @@ public class XRRig_CameraMover : MonoBehaviour, IXRRig_CameraMover
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Helper functions
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    public void TestMoveOrTeleport(XREvent theEvent, XRDeviceEventTypes eventType, GameObject marker, GameObject pointer)
+    private void TestMoveOrTeleport(XREvent theEvent, XRDeviceEventTypes eventType, GameObject marker, GameObject pointer)
     {
         if ((theEvent.eventType == eventType) && (theEvent.eventAction == XRDeviceActions.CLICK))
         {

@@ -51,8 +51,8 @@ public class XRUX_Knob_Sizer : MonoBehaviour
             // Collider position and scale
             if (theCollider != null)
             {
-                theCollider.center = new Vector3(0, 0, -thickness);
-                theCollider.size = new Vector3(width * 0.75f, height * 0.75f, thickness * 2.0f);
+                theCollider.center = new Vector3(0, 0, -thickness / 2.0f);
+                theCollider.size = new Vector3(width * 0.75f, height * 0.75f, thickness);
             }
             RectTransform titleRect = (titleObject == null) ? null : titleObject.GetComponent<RectTransform>();
 

@@ -22,6 +22,7 @@ public class XRUX_InputField_Editor : Editor
     public override void OnInspectorGUI()
     {
         XRUX_Inputfield myTarget = (XRUX_Inputfield)target;
+        myTarget.mode = (XRData.Mode) EditorGUILayout.EnumPopup("Inspector Mode", myTarget.mode);
 
         XRUX_Editor_Settings.DrawMainHeading("Input Field", "An XR UX element that collects text as if from a keyboard.");
 

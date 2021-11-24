@@ -26,8 +26,13 @@ public class XRRig_MakeVisible_Editor : Editor
         XRUX_Editor_Settings.DrawMainHeading("Make Visible", "Make GameObject visible on given event and action.");
 
         XRUX_Editor_Settings.DrawInputsHeading();
-        myTarget.eventToWatchFor = (XRDeviceEventTypes) EditorGUILayout.EnumPopup("Event to watch for", myTarget.eventToWatchFor);
-        myTarget.actionToWatchFor = (XRDeviceActions) EditorGUILayout.EnumPopup("Action to watch for", myTarget.actionToWatchFor);
+        EditorGUILayout.LabelField("Input", "XRData", XRUX_Editor_Settings.fieldStyle);
+        myTarget.activateOnEvent = EditorGUILayout.Toggle("Activate on OpenXR Event", myTarget.activateOnEvent);
+        if (myTarget.activateOnEvent)
+        {
+            myTarget.eventToWatchFor = (XRDeviceEventTypes) EditorGUILayout.EnumPopup("Event to watch for", myTarget.eventToWatchFor);
+            myTarget.actionToWatchFor = (XRDeviceActions) EditorGUILayout.EnumPopup("Action to watch for", myTarget.actionToWatchFor);
+        }
 
         XRUX_Editor_Settings.DrawParametersHeading();
 

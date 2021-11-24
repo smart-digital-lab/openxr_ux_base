@@ -133,6 +133,7 @@ public class XRRig_Manager : MonoBehaviour, IXRRig_Manager
         // Get the devices in the left and right hands respectively
         InputDevices.GetDevicesAtXRNode(XRNode.LeftHand, leftHandDevices);
         InputDevices.GetDevicesAtXRNode(XRNode.RightHand, rightHandDevices);
+        Application.targetFrameRate = 90;
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 

@@ -50,8 +50,8 @@ public class XRUX_RadioButton_Sizer : MonoBehaviour
             // Collider position and scale
             if (theCollider != null)
             {
-                theCollider.center = new Vector3(0, 0, -thickness * 1.5f);
-                theCollider.size = new Vector3(width * 0.75f, height * 0.75f, thickness * 3.0f);
+                theCollider.center = new Vector3(0, 0, -thickness / 2.0f);
+                theCollider.size = new Vector3(width * 0.75f, height * 0.75f, thickness);
             }
             objectToResize.transform.localPosition = new Vector3(0, 0, 0);
 

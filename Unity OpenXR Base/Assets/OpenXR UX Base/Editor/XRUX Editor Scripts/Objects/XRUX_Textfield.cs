@@ -22,6 +22,7 @@ public class XRUX_Textfield_Editor : Editor
     public override void OnInspectorGUI()
     {
         XRUX_Textfield myTarget = (XRUX_Textfield)target;
+        myTarget.mode = (XRData.Mode) EditorGUILayout.EnumPopup("Inspector Mode", myTarget.mode);
 
         XRUX_Editor_Settings.DrawMainHeading("Text Field", "A one-line text field (simpler than the inputfield).");
 

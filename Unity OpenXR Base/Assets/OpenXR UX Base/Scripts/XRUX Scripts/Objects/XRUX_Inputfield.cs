@@ -47,6 +47,7 @@ public class XRUX_Inputfield : MonoBehaviour, IXRUX_Inputfield
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Public variables
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
+    public XRData.Mode mode = XRData.Mode.User; // For use in the inspector only
     public bool singleCharacters = true;
     public UnityXRDataEvent onSend; // Functions to call when the send is called (eg when the enter key is pressed)
     // ------------------------------------------------------------------------------------------------------------------------------------------------------

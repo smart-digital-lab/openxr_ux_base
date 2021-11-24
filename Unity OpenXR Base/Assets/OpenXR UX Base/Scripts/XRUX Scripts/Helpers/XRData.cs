@@ -104,10 +104,15 @@ public class XRData
     }
     public static Vector3 ToVector3(ArrayList data)
     {
-        float x, y, z = 0.0f;
-        float.TryParse(data[0].ToString(), out x);
-        float.TryParse(data[1].ToString(), out y);
-        float.TryParse(data[2].ToString(), out z);
+        float x = 0.0f;
+        float y = 0.0f;
+        float z = 0.0f;
+        if (data != null)
+        {
+            float.TryParse(data[0].ToString(), out x);
+            float.TryParse(data[1].ToString(), out y);
+            float.TryParse(data[2].ToString(), out z);
+        }
         return new Vector3(x,y,z);
     }
     public static string FromVector3(Vector3 data)
