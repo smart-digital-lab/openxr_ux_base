@@ -371,7 +371,7 @@ public class XRRig_CameraMover : MonoBehaviour, IXRRig_CameraMover
         Vector3 deltaVelocity = acceleration * accelerationFactor * Time.deltaTime;
 
         // Friction is used to slow the movement once no controls are being pushed.  Friction is a function of velocity.
-        Vector3 friction = new (
+        Vector3 friction = new Vector3 (
             velocity.x * (0.5f + hitFrictionFactor) * frictionFactor * Time.deltaTime,
             velocity.y * (0.5f + hitFrictionFactor) * frictionFactor * Time.deltaTime,  
             velocity.z * (0.5f + hitFrictionFactor) * frictionFactor * Time.deltaTime
