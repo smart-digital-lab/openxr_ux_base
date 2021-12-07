@@ -46,12 +46,15 @@ public class XRRig_CameraMover_Editor : Editor
             myTarget.rightPointer = (GameObject) EditorGUILayout.ObjectField("Right hand pointer", myTarget.rightPointer, typeof(GameObject), true);
             myTarget.theHead = (GameObject) EditorGUILayout.ObjectField("The head object", myTarget.theHead, typeof(GameObject), true);
             myTarget.thePlayer = (GameObject) EditorGUILayout.ObjectField("The Player object", myTarget.thePlayer, typeof(GameObject), true);
+            myTarget.mainBody = (GameObject) EditorGUILayout.ObjectField("Main Body", myTarget.mainBody, typeof(GameObject), true);
             myTarget.instructions = (GameObject) EditorGUILayout.ObjectField("Instructions", myTarget.instructions, typeof(GameObject), true);
         }
 
-        EditorGUILayout.Space();
+        myTarget.height = EditorGUILayout.FloatField("Head height", myTarget.height);
+
         if (myTarget.mode == XRData.Mode.Advanced)
         {
+            EditorGUILayout.Space();
             EditorGUILayout.LabelField("Teleportation", XRUX_Editor_Settings.categoryStyle);
         }
         myTarget.movementStyle = (XRRig_CameraMover.MovementStyle) EditorGUILayout.EnumPopup("Movement style", myTarget.movementStyle);

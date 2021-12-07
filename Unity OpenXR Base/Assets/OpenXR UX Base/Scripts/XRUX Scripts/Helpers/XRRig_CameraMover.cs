@@ -50,6 +50,8 @@ public class XRRig_CameraMover : MonoBehaviour, IXRRig_CameraMover
     public GameObject teleportFader;
     public GameObject theHead;
     public GameObject thePlayer;
+    public GameObject mainBody;
+    public float height = 2.0f;
     public float teleportFadeTime = 2.0f;
     public GameObject instructions;
     public MovementHand movementController = MovementHand.Right;
@@ -137,6 +139,9 @@ public class XRRig_CameraMover : MonoBehaviour, IXRRig_CameraMover
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     void Start()
     {
+        // Set the body height;
+        if (mainBody != null) mainBody.transform.localPosition = new Vector3(mainBody.transform.localPosition.x, height, mainBody.transform.localPosition.z);
+
         // Listen for events coming from the XR Controllers and other devices
         if (XRRig.EventQueue != null) XRRig.EventQueue.AddListener(OnDeviceEvent);
 
@@ -216,7 +221,6 @@ public class XRRig_CameraMover : MonoBehaviour, IXRRig_CameraMover
 
         if (XRMode == XRType.Desktop_XR)
         {
-            if (theHead != null) theHead.transform.localPosition = new Vector3(0, 1.5f, 0);
             Camera.main.fieldOfView = 60.0f;
             rightMarker.SetActive(false);
         }
@@ -274,7 +278,7 @@ public class XRRig_CameraMover : MonoBehaviour, IXRRig_CameraMover
         Vector3 nextStep = position + direction;
 
         // Take into account the person wearing the HMD's head height
-        float headHeight = (theHead == null) ? 2.0f : theHead.transform.position.y - transform.position.y;
+        float headHeight = (theHead == null) ? height : theHead.transform.position.y - transform.position.y;
 
         // Raycast down from where we are going to be
         return (Physics.Raycast(new Vector3(nextStep.x, nextStep.y + headHeight, nextStep.z), -Vector3.up, headHeight + 0.1f, 1<<(int)OpenXR_UX_Layers.NoGo_Areas));
@@ -282,7 +286,7 @@ public class XRRig_CameraMover : MonoBehaviour, IXRRig_CameraMover
     private bool ObstacleCheckForward(Vector3 position, Vector3 direction)
     {
         // Take into account the person wearing the HMD's headheight
-        float headHeight = (theHead == null) ? 2.0f : theHead.transform.position.y - transform.position.y;
+        float headHeight = (theHead == null) ? height : theHead.transform.position.y - transform.position.y;
 
         // Raycast forward from current position towards next position
         return (Physics.Raycast(
@@ -297,18 +301,18 @@ public class XRRig_CameraMover : MonoBehaviour, IXRRig_CameraMover
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Find distance above areas
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    private bool HeightAbove(Vector3 position, out float height)
+    private bool HeightAbove(Vector3 position, out float newHeight)
     {
         RaycastHit hit;
-        float headHeight = (theHead == null) ? 2.0f : theHead.transform.position.y - transform.position.y;
+        float headHeight = (theHead == null) ? height : theHead.transform.position.y - transform.position.y;
         bool answer =  (Physics.Raycast(new Vector3(position.x, position.y + headHeight, position.z), -Vector3.up, out hit, headHeight + 0.5f, 1<<(int)OpenXR_UX_Layers.Go_Areas));
         if (answer)
         {
-            height = hit.point.y - position.y;
+            newHeight = hit.point.y - position.y;
         }
         else
         {
-            height = 0.0f;
+            newHeight = 0.0f;
         }
         return (answer);
     }
