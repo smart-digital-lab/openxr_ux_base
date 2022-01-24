@@ -213,7 +213,7 @@ public class XRRig_CameraMover : MonoBehaviour, IXRRig_CameraMover
         if (thePlayer != null) thePlayer.transform.localPosition = Vector3.zero;
 
         RaycastHit hit;
-        bool answer = (Physics.Raycast(new Vector3(transform.position.x, transform.position.y + 1.0f, transform.position.z), -Vector3.up, out hit, 2.0f, 1<<(int)OpenXR_UX_Layers.Go_Areas));
+        bool answer = (Physics.Raycast(new Vector3(transform.position.x, transform.position.y + 1.0f, transform.position.z), -Vector3.up, out hit, height, 1<<(int)OpenXR_UX_Layers.Go_Areas));
         if (answer)
         {
             transform.position = hit.point;
@@ -221,6 +221,7 @@ public class XRRig_CameraMover : MonoBehaviour, IXRRig_CameraMover
 
         if (XRMode == XRType.Desktop_XR)
         {
+            // if (theHead != null) theHead.transform.localPosition = new Vector3(0, 1.5f, 0);
             Camera.main.fieldOfView = 60.0f;
             rightMarker.SetActive(false);
         }
@@ -280,8 +281,24 @@ public class XRRig_CameraMover : MonoBehaviour, IXRRig_CameraMover
         // Take into account the person wearing the HMD's head height
         float headHeight = (theHead == null) ? height : theHead.transform.position.y - transform.position.y;
 
+        RaycastHit hit_nogo;
+        RaycastHit hit_go;
+        bool nogo_down = Physics.Raycast(new Vector3(nextStep.x, nextStep.y + headHeight, nextStep.z), -Vector3.up, out hit_nogo, headHeight + 0.1f, 1<<(int)OpenXR_UX_Layers.NoGo_Areas);
+        bool go_down = Physics.Raycast(new Vector3(nextStep.x, nextStep.y + headHeight, nextStep.z), -Vector3.up, out hit_go, headHeight + 0.1f, 1<<(int)OpenXR_UX_Layers.Go_Areas);
+
+        bool answer = false;
+        if (nogo_down && go_down)
+        {
+            // Obstacle if the nogo layer is above the go layer
+            answer = hit_nogo.point.y > hit_go.point.y;            
+        }
+        else if (nogo_down)
+        {
+            answer = true;
+        }
+
         // Raycast down from where we are going to be
-        return (Physics.Raycast(new Vector3(nextStep.x, nextStep.y + headHeight, nextStep.z), -Vector3.up, headHeight + 0.1f, 1<<(int)OpenXR_UX_Layers.NoGo_Areas));
+        return (answer);
     }
     private bool ObstacleCheckForward(Vector3 position, Vector3 direction)
     {
