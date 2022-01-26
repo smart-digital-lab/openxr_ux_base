@@ -139,6 +139,9 @@ public class XRRig_CameraMover : MonoBehaviour, IXRRig_CameraMover
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     void Start()
     {
+        // Only use the height in desktop mode
+        if (XRSettings.isDeviceActive) height = 0;
+
         // Set the body height;
         if (mainBody != null) mainBody.transform.localPosition = new Vector3(mainBody.transform.localPosition.x, height, mainBody.transform.localPosition.z);
 
